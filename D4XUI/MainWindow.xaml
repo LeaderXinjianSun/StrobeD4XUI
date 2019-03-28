@@ -5,8 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="D4XUI" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="NoResize"
+        Loaded="Window_Loaded">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2.5*"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.Background>
+                <ImageBrush ImageSource="D4X俯视图截图01.jpg"></ImageBrush>
+            </Grid.Background>
+        </Grid>
+        <TextBox Margin="1" x:Name="MsgTextBox" Grid.Row="1" IsReadOnly="True" TextChanged="MsgTextBox_TextChanged"  FontSize="14" Background="Black" FontFamily="宋体" Foreground="White" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0"></TextBox>
+        <StackPanel Grid.Column="1">
+            <Button Width="80" Height="30" Click="Button_Click"></Button>
+        </StackPanel>
+   
+            
+        <StatusBar Grid.Row="2">
+            <Label>PLC</Label>
+            <Ellipse Name="PLCStatusEllipse" Width="20" Height="20"></Ellipse>
+        </StatusBar>
     </Grid>
 </Window>
