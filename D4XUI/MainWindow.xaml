@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="NoResize"
+        Title="D4XUI 20190331" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="NoResize"
         Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
@@ -21,14 +21,161 @@
             <Grid.Background>
                 <ImageBrush ImageSource="D4X俯视图截图01.jpg"></ImageBrush>
             </Grid.Background>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Name="AlarmGrid" Grid.Row="1" Background="Red">
+                <TextBlock Name="AlarmTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="26"></TextBlock>
+            </Grid>
         </Grid>
         <TextBox Margin="1" x:Name="MsgTextBox" Grid.Row="1" IsReadOnly="True" TextChanged="MsgTextBox_TextChanged"  FontSize="14" Background="Black" FontFamily="宋体" Foreground="White" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0"></TextBox>
-        <StackPanel Grid.Column="1">
-            <Button Width="80" Height="30" Click="Button_Click"></Button>
-        </StackPanel>
-   
+     
+        <Grid Grid.Column="1" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <Button Width="80" Height="30" Content="功能" Click="Button_Click"></Button>
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="上料机故障时间" Width="100"></TextBlock>
+                        <TextBlock Name="Downtime" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="转盘故障时间" Width="100"></TextBlock>
+                        <TextBlock Name="Zhuanpandowntime" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="灵敏度故障时间" Width="100"></TextBlock>
+                        <TextBlock Name="Lingmindudowntime" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="贴膜机故障时间" Width="100"></TextBlock>
+                        <TextBlock Name="Tiemojidowntime" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="等待上料转盘时间" Width="100"></TextBlock>
+                        <TextBlock Name="Waitzhuanpanforinput" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="等待上灵敏度时间" Width="100"></TextBlock>
+                        <TextBlock Name="Waitlingminduforinput" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="等待下贴膜机时间" Width="100"></TextBlock>
+                        <TextBlock Name="WaitTiemojiforinput" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="上料/收盘等待时间" Width="100"></TextBlock>
+                        <TextBlock Name="Waitfortake" Width="60"></TextBlock>
+                        <TextBlock Text="min" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="上料机投入数量" Width="100"></TextBlock>
+                        <TextBlock Name="input" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="上料机产出数量" Width="100"></TextBlock>
+                        <TextBlock Name="output" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="总测试数量" Width="100"></TextBlock>
+                        <TextBlock Name="TestCount_Total" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="总PASS数量" Width="100"></TextBlock>
+                        <TextBlock Name="PassCount_Total" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="总直通率" Width="100"></TextBlock>
+                        <TextBlock Name="Yield_Total" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="转盘测试数量" Width="100"></TextBlock>
+                        <TextBlock Name="TestCount_1" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="转盘PASS数量" Width="100"></TextBlock>
+                        <TextBlock Name="PassCount_1" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="转盘直通率" Width="100"></TextBlock>
+                        <TextBlock Name="Yield_1" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="灵敏度测试数量" Width="100"></TextBlock>
+                        <TextBlock Name="TestCount_2" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="灵敏度PASS数量" Width="100"></TextBlock>
+                        <TextBlock Name="PassCount_2" Width="60"></TextBlock>
+                        <TextBlock Text="Pcs" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="灵敏度直通率" Width="100"></TextBlock>
+                        <TextBlock Name="Yield_2" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="上料机报警数量" Width="100"></TextBlock>
+                        <TextBlock Name="AlarmCount" Width="60"></TextBlock>
+                        <TextBlock Text="次" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="达成率" Width="100"></TextBlock>
+                        <TextBlock Name="AchievingRate" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="妥善率" Width="100"></TextBlock>
+                        <TextBlock Name="ProperRate" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="上料机妥善率" Width="100"></TextBlock>
+                        <TextBlock Name="ProperRate_AutoMation" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="转盘治具妥善率" Width="100"></TextBlock>
+                        <TextBlock Name="ProperRate_Zhuanpan" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="灵敏度治具妥善率" Width="100"></TextBlock>
+                        <TextBlock Name="ProperRate_Lingmindu" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="贴膜机妥善率" Width="100"></TextBlock>
+                        <TextBlock Name="ProperRate_Tiemoji" Width="60"></TextBlock>
+                        <TextBlock Text="%" Width="30"></TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
             
-        <StatusBar Grid.Row="2">
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
             <Label>PLC</Label>
             <Ellipse Name="PLCStatusEllipse" Width="20" Height="20"></Ellipse>
         </StatusBar>
