@@ -405,7 +405,7 @@ namespace BingLibrary.hjb.PLC
                     break;
                 case "HD"://32位
                     functionCode = "03";
-                    coilStartlAddress = (41088 + coilAddress).ToString("X4");
+                    coilStartlAddress = (41087 + coilAddress).ToString("X4");
                     coilCount = (Convert.ToInt32(coilCount, 16) * 2).ToString("X4");
                     break;
                 case "W"://16位

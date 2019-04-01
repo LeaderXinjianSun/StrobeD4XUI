@@ -41,13 +41,14 @@ namespace D4XUI
         string DangbanFirstProduct = "";
         string LastBanci = "";
         Double UPH;
+        int tick = 0;
         #endregion
         public MainWindow()
         {
             InitializeComponent();
 
             dispatcherTimer.Tick += new EventHandler(DispatcherTimerTickUpdateUi);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 6);//6秒更新一次，即0.1分钟。
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);//6秒更新一次，即0.1分钟。
 
         }
         private void MsgTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -56,6 +57,7 @@ namespace D4XUI
         }
         private void DispatcherTimerTickUpdateUi(Object sender, EventArgs e)
         {
+
             MsgTextBox.Text = MessageStr;
             PLCStatusEllipse.Fill = plcstate ? Brushes.Green : Brushes.Red;
             AlarmGrid.Visibility = Visibility.Collapsed;
@@ -79,183 +81,187 @@ namespace D4XUI
             {
                 Inifile.INIWriteValue(iniFClient, "Alarm", "Name", "NULL");
             }
-            #region 及时雨
-            if (M10000 != null && plcstate)
+            if (++tick >= 60)
             {
-                if (LastBanci != GetBanci())
+                tick = 0;
+                #region 及时雨
+                if (M10000 != null && plcstate)
                 {
-                    LastBanci = GetBanci();
-                    Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
-                    AddMessage(LastBanci + " 换班数据清零");
-                    WriteMachineData();
-                    downtime = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString());
-                    zhuanpandowntime = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString());
-                    lingmindudowntime = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString());
-                    tiemojidowntime = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString());
-                    waitzhuanpanforinput = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString());
-                    waitlingminduforinput = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitlingminduforinput", waitlingminduforinput.ToString());
-                    waitfortake = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString());
-                    worktime = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Worktime", worktime.ToString());
-                    runtime = 0;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Runtime", runtime.ToString());
+                    if (LastBanci != GetBanci())
+                    {
+                        LastBanci = GetBanci();
+                        Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
+                        AddMessage(LastBanci + " 换班数据清零");
+                        WriteMachineData();
+                        downtime = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString());
+                        zhuanpandowntime = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString());
+                        lingmindudowntime = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString());
+                        tiemojidowntime = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString());
+                        waitzhuanpanforinput = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString());
+                        waitlingminduforinput = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitlingminduforinput", waitlingminduforinput.ToString());
+                        waitfortake = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString());
+                        worktime = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Worktime", worktime.ToString());
+                        runtime = 0;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Runtime", runtime.ToString());
 
-                    Xinjie.SetM(10099, true);//通知PLC换班，计数清空
+                        Xinjie.SetM(10099, true);//通知PLC换班，计数清空
+                    }
+                    if (D1200 == 1 && DangbanFirstProduct != GetBanci())
+                    {
+                        DangbanFirstProduct = GetBanci();
+                        Inifile.INIWriteValue(iniParameterPath, "Summary", "DangbanFirstProduct", DangbanFirstProduct);
+                        AddMessage(DangbanFirstProduct + " 开始生产");
+                    }
+                    if (M10000[100] && DangbanFirstProduct == GetBanci())
+                    {
+                        downtime += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString());
+                    }
+                    if (M10000[101] && DangbanFirstProduct == GetBanci())
+                    {
+                        zhuanpandowntime += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString());
+                    }
+                    if (M10000[102] && DangbanFirstProduct == GetBanci())
+                    {
+                        lingmindudowntime += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString());
+                    }
+                    if (M10000[103] && DangbanFirstProduct == GetBanci())
+                    {
+                        tiemojidowntime += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString());
+                    }
+                    if (M10000[104] && DangbanFirstProduct == GetBanci())
+                    {
+                        waitzhuanpanforinput += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString());
+                    }
+                    if (M10000[105] && DangbanFirstProduct == GetBanci())
+                    {
+                        waitlingminduforinput += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitlingminduforinput", waitlingminduforinput.ToString());
+                    }
+                    if (M10000[106] && DangbanFirstProduct == GetBanci())
+                    {
+                        waitTiemojiforinput += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "WaitTiemojiforinput", waitTiemojiforinput.ToString());
+                    }
+                    if (M10000[107] && DangbanFirstProduct == GetBanci())
+                    {
+                        waitfortake += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString());
+                    }
+                    input.Text = HD200[0].ToString();
+                    Inifile.INIWriteValue(iniFClient, "DataList", "input", input.Text);
+                    output.Text = HD200[1].ToString();
+                    Inifile.INIWriteValue(iniFClient, "DataList", "output", output.Text);
+                    TestCount_Total.Text = HD200[2].ToString();
+                    Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_Total", TestCount_Total.Text);
+                    PassCount_Total.Text = HD200[3].ToString();
+                    if (HD200[2] == 0)
+                    {
+                        Yield_Total.Text = "0";
+                    }
+                    else
+                    {
+                        Yield_Total.Text = (HD200[3] / HD200[2] * 100).ToString("F1");
+                    }
+                    Inifile.INIWriteValue(iniFClient, "DataList", "Yield_Total", Yield_Total.Text);
+                    TestCount_1.Text = HD200[4].ToString();
+                    Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_1", TestCount_1.Text);
+                    PassCount_1.Text = HD200[5].ToString();
+                    if (HD200[4] == 0)
+                    {
+                        Yield_1.Text = "0";
+                    }
+                    else
+                    {
+                        Yield_1.Text = (HD200[5] / HD200[4] * 100).ToString("F1");
+                    }
+                    Inifile.INIWriteValue(iniFClient, "DataList", "Yield_1", Yield_1.Text);
+
+                    TestCount_2.Text = HD200[6].ToString();
+                    Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_2", TestCount_2.Text);
+                    PassCount_2.Text = HD200[7].ToString();
+                    if (HD200[6] == 0)
+                    {
+                        Yield_2.Text = "0";
+                    }
+                    else
+                    {
+                        Yield_2.Text = (HD200[7] / HD200[6] * 100).ToString("F1");
+                    }
+                    Inifile.INIWriteValue(iniFClient, "DataList", "Yield_2", Yield_2.Text);
+                    AlarmCount.Text = HD200[8].ToString();
+                    Inifile.INIWriteValue(iniFClient, "Alarm", "count", AlarmCount.Text);
+                    Inifile.INIWriteValue(iniFClient, "state", "state", D1200.ToString());
+
+                    if (DangbanFirstProduct == GetBanci())
+                    {
+                        worktime += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Worktime", worktime.ToString());
+                    }
+                    if (DangbanFirstProduct == GetBanci() && D1200 == 1)
+                    {
+                        runtime += 0.1;
+                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Runtime", runtime.ToString());
+                    }
+                    if (runtime == 0 || UPH == 0)
+                        AchievingRate.Text = "100";
+                    else
+                        AchievingRate.Text = (HD200[1] / (UPH / 60 * runtime) * 100).ToString("F1");
+                    Inifile.INIWriteValue(iniFClient, "DataList", "AchievingRate", AchievingRate.Text);
+
                 }
-                if (D1200 == 1 && DangbanFirstProduct != GetBanci())
+                Downtime.Text = downtime.ToString();
+                Zhuanpandowntime.Text = zhuanpandowntime.ToString();
+                Lingmindudowntime.Text = lingmindudowntime.ToString();
+                Tiemojidowntime.Text = tiemojidowntime.ToString();
+                Waitzhuanpanforinput.Text = waitzhuanpanforinput.ToString();
+                Waitlingminduforinput.Text = waitlingminduforinput.ToString();
+                WaitTiemojiforinput.Text = waitTiemojiforinput.ToString();
+                Waitfortake.Text = waitfortake.ToString();
+                Inifile.INIWriteValue(iniFClient, "DataList", "Downtime", downtime.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "Zhuanpandowntime", zhuanpandowntime.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "Lingmindudowntime", lingmindudowntime.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "Tiemojidowntime", tiemojidowntime.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "Waitlingminduforinput", waitlingminduforinput.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "WaitTiemojiforinput", waitTiemojiforinput.ToString());
+                Inifile.INIWriteValue(iniFClient, "DataList", "Waitfortake", waitfortake.ToString());
+
+                if (worktime == 0)
                 {
-                    DangbanFirstProduct = GetBanci();
-                    Inifile.INIWriteValue(iniParameterPath, "Summary", "DangbanFirstProduct", DangbanFirstProduct);
-                    AddMessage(DangbanFirstProduct + " 开始生产");
-                }
-                if (M10000[100] && DangbanFirstProduct == GetBanci())
-                {
-                    downtime += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString());
-                }
-                if (M10000[101] && DangbanFirstProduct == GetBanci())
-                {
-                    zhuanpandowntime += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString());
-                }
-                if (M10000[102] && DangbanFirstProduct == GetBanci())
-                {
-                    lingmindudowntime += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString());
-                }
-                if (M10000[103] && DangbanFirstProduct == GetBanci())
-                {
-                    tiemojidowntime += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString());
-                }
-                if (M10000[104] && DangbanFirstProduct == GetBanci())
-                {
-                    waitzhuanpanforinput += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString());
-                }
-                if (M10000[105] && DangbanFirstProduct == GetBanci())
-                {
-                    waitlingminduforinput += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitlingminduforinput", waitlingminduforinput.ToString());
-                }
-                if (M10000[106] && DangbanFirstProduct == GetBanci())
-                {
-                    waitTiemojiforinput += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "WaitTiemojiforinput", waitTiemojiforinput.ToString());
-                }
-                if (M10000[107] && DangbanFirstProduct == GetBanci())
-                {
-                    waitfortake += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString());
-                }
-                input.Text = HD200[0].ToString();
-                Inifile.INIWriteValue(iniFClient, "DataList", "input", input.Text);
-                output.Text = HD200[1].ToString();
-                Inifile.INIWriteValue(iniFClient, "DataList", "output", output.Text);
-                TestCount_Total.Text = HD200[2].ToString();
-                Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_Total", TestCount_Total.Text);
-                PassCount_Total.Text = HD200[3].ToString();
-                if (HD200[2] == 0)
-                {
-                    Yield_Total.Text = "0";
+                    ProperRate.Text = "0";
+                    ProperRate_AutoMation.Text = "0";
+                    ProperRate_Zhuanpan.Text = "0";
+                    ProperRate_Lingmindu.Text = "0";
+                    ProperRate_Tiemoji.Text = "0";
                 }
                 else
                 {
-                    Yield_Total.Text = (HD200[3] / HD200[2] * 100).ToString("F1");
+                    ProperRate.Text = ((1 - (downtime + zhuanpandowntime + lingmindudowntime + tiemojidowntime) / worktime) * 100).ToString("F1");
+                    ProperRate_AutoMation.Text = ((1 - downtime / worktime) * 100).ToString("F1");
+                    ProperRate_Zhuanpan.Text = ((1 - zhuanpandowntime / worktime) * 100).ToString("F1");
+                    ProperRate_Lingmindu.Text = ((1 - lingmindudowntime / worktime) * 100).ToString("F1");
+                    ProperRate_Tiemoji.Text = ((1 - tiemojidowntime / worktime) * 100).ToString("F1");
                 }
-                Inifile.INIWriteValue(iniFClient, "DataList", "Yield_Total", Yield_Total.Text);
-                TestCount_1.Text = HD200[4].ToString();
-                Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_1", TestCount_1.Text);
-                PassCount_1.Text = HD200[5].ToString();
-                if (HD200[4] == 0)
-                {
-                    Yield_1.Text = "0";
-                }
-                else
-                {
-                    Yield_1.Text = (HD200[5] / HD200[4] * 100).ToString("F1");
-                }
-                Inifile.INIWriteValue(iniFClient, "DataList", "Yield_1", Yield_1.Text);
-
-                TestCount_2.Text = HD200[6].ToString();
-                Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_2", TestCount_2.Text);
-                PassCount_2.Text = HD200[7].ToString();
-                if (HD200[6] == 0)
-                {
-                    Yield_2.Text = "0";
-                }
-                else
-                {
-                    Yield_2.Text = (HD200[7] / HD200[6] * 100).ToString("F1");
-                }
-                Inifile.INIWriteValue(iniFClient, "DataList", "Yield_2", Yield_2.Text);
-                AlarmCount.Text = HD200[8].ToString();
-                Inifile.INIWriteValue(iniFClient, "Alarm", "count", AlarmCount.Text);
-                Inifile.INIWriteValue(iniFClient, "state", "state", D1200.ToString());
-
-                if (DangbanFirstProduct == GetBanci())
-                {
-                    worktime += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Worktime", worktime.ToString());
-                }
-                if (DangbanFirstProduct == GetBanci() && D1200 == 1)
-                {
-                    runtime += 0.1;
-                    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Runtime", runtime.ToString());
-                }
-                if (runtime == 0 || UPH == 0)
-                    AchievingRate.Text = "100";
-                else
-                    AchievingRate.Text = (HD200[1] / (UPH / 60 * runtime) * 100).ToString("F1");
-                Inifile.INIWriteValue(iniFClient, "DataList", "AchievingRate", AchievingRate.Text);
-
+                Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate", ProperRate.Text);
+                Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_AutoMation", ProperRate_AutoMation.Text);
+                Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Zhuanpan", ProperRate_Zhuanpan.Text);
+                Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Lingmindu", ProperRate_Lingmindu.Text);
+                Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Tiemoji", ProperRate_Tiemoji.Text);
+                #endregion
             }
-            Downtime.Text = downtime.ToString();
-            Zhuanpandowntime.Text = zhuanpandowntime.ToString();
-            Lingmindudowntime.Text = lingmindudowntime.ToString();
-            Tiemojidowntime.Text = tiemojidowntime.ToString();
-            Waitzhuanpanforinput.Text = waitzhuanpanforinput.ToString();
-            Waitlingminduforinput.Text = waitlingminduforinput.ToString();
-            WaitTiemojiforinput.Text = waitTiemojiforinput.ToString();
-            Waitfortake.Text = waitfortake.ToString();
-            Inifile.INIWriteValue(iniFClient, "DataList", "Downtime", downtime.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "Zhuanpandowntime", zhuanpandowntime.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "Lingmindudowntime", lingmindudowntime.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "Tiemojidowntime", tiemojidowntime.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "Waitlingminduforinput", waitlingminduforinput.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "WaitTiemojiforinput", waitTiemojiforinput.ToString());
-            Inifile.INIWriteValue(iniFClient, "DataList", "Waitfortake", waitfortake.ToString());
-
-            if (worktime == 0)
-            {
-                ProperRate.Text = "0";
-                ProperRate_AutoMation.Text = "0";
-                ProperRate_Zhuanpan.Text = "0";
-                ProperRate_Lingmindu.Text = "0";
-                ProperRate_Tiemoji.Text = "0";
-            }
-            else
-            {
-                ProperRate.Text = ((1 - (downtime + zhuanpandowntime + lingmindudowntime + tiemojidowntime) / worktime) * 100).ToString("F1");
-                ProperRate_AutoMation.Text = ((1 - downtime / worktime) * 100).ToString("F1");
-                ProperRate_Zhuanpan.Text = ((1 - zhuanpandowntime / worktime) * 100).ToString("F1");
-                ProperRate_Lingmindu.Text = ((1 - lingmindudowntime / worktime) * 100).ToString("F1");
-                ProperRate_Tiemoji.Text = ((1 - tiemojidowntime / worktime) * 100).ToString("F1");
-            }
-            Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate", ProperRate.Text);
-            Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_AutoMation", ProperRate_AutoMation.Text);
-            Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Zhuanpan", ProperRate_Zhuanpan.Text);
-            Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Lingmindu", ProperRate_Lingmindu.Text);
-            Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Tiemoji", ProperRate_Tiemoji.Text);
-            #endregion
 
         }
         private void WriteMachineData()
@@ -357,6 +363,7 @@ namespace D4XUI
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UDPInit();
+            LoadParameter();
             Async.RunFuncAsync(PLCWork, null);
             LoadAlarmNames();
             LoadTimelyRain();
@@ -519,7 +526,7 @@ namespace D4XUI
         double D1200;
         public void PLCWork()
         {
-            string COM = Inifile.INIGetStringValue(iniParameterPath, "PLC", "COM", "COM12");
+            string COM = Inifile.INIGetStringValue(iniParameterPath, "PLC", "COM", "COM19");
             while (true)
             {
                 System.Threading.Thread.Sleep(10);
@@ -554,10 +561,10 @@ namespace D4XUI
         #endregion
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            
+
             await udp1.SendAsync("test");
             AddMessage(await udp1.ReceiveAsync());
-           
+
         }
     }
 }
