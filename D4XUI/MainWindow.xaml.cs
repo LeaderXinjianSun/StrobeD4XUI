@@ -625,7 +625,7 @@ namespace D4XUI
         bool plcstate = false;
         ObservableCollection<bool> M10000;
         ObservableCollection<double> HD200;
-        bool M10140 = false, M10141 = false, M10150 = false;
+        bool M10140 = false, M10141 = false, M10150 = false, M10151 = false, M10152 = false, M10153 = false, M10154 = false;
         bool M10142 = false, M10143 = false;
         bool M10144 = false, M10145 = false;
         bool M10146 = false, M10147 = false;
@@ -850,6 +850,10 @@ namespace D4XUI
                         M10142 = M10000[142];//左穴空,清空左穴条码
                         M10143 = M10000[143];//右穴空,清空右穴条码
                         M10150 = M10000[150];
+                        M10151 = M10000[151];
+                        M10152 = M10000[152];
+                        M10153 = M10000[153];
+                        M10154 = M10000[154];
                     }
                     if (M10140 != M10000[140])
                     {
@@ -923,6 +927,54 @@ namespace D4XUI
                             LingminduBarcode2.Text = "null";
                             LingminduBarcode2.Background = Brushes.White;
                             Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
+                        }
+                    }
+                    if (M10151 != M10000[151])
+                    {
+                        M10151 = M10000[151];
+                        if (M10151)
+                        {
+                            LingminduJieGuo1.Background = Brushes.LightGreen;
+                        }
+                        else
+                        {
+                            LingminduJieGuo1.Background = Brushes.Gray;
+                        }
+                    }
+                    if (M10152 != M10000[152])
+                    {
+                        M10152 = M10000[152];
+                        if (M10152)
+                        {
+                            LingminduJieGuo1.Background = Brushes.Red;
+                        }
+                        else
+                        {
+                            LingminduJieGuo1.Background = Brushes.Gray;
+                        }
+                    }
+                    if (M10153 != M10000[153])
+                    {
+                        M10153 = M10000[153];
+                        if (M10153)
+                        {
+                            LingminduJieGuo2.Background = Brushes.LightGreen;
+                        }
+                        else
+                        {
+                            LingminduJieGuo2.Background = Brushes.Gray;
+                        }
+                    }
+                    if (M10154 != M10000[154])
+                    {
+                        M10154 = M10000[154];
+                        if (M10154)
+                        {
+                            LingminduJieGuo2.Background = Brushes.Red;
+                        }
+                        else
+                        {
+                            LingminduJieGuo2.Background = Brushes.Gray;
                         }
                     }
                 }

@@ -34,9 +34,9 @@
                 <TextBlock Name="LingminduBarcode1" Canvas.Top="300" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Lingmindubarcode1"></TextBlock>
                 <!--<TextBlock Text="灵敏度左穴样本匹配结果" Width="100" Canvas.Top="230" Canvas.Left="480"></TextBlock>
                 <TextBlock Text="灵敏度右穴样本匹配结果" Width="100" Canvas.Top="280" Canvas.Left="480"></TextBlock>-->
-                <!--<TextBlock Name="LingminduJieGuo1" Canvas.Top="250" Canvas.Left="550" FontWeight="Bold" Background="White" FontSize="15"></TextBlock>
-                <TextBlock Name="LingminduJieGuo2" Canvas.Top="300" Canvas.Left="550" FontWeight="Bold" Background="White" FontSize="15"></TextBlock>-->
-                <Label Canvas.Bottom="100" Canvas.Left="2" Content="红色:NG 绿色:OK 白色:清空 灰色:无结果" Background="Black" Foreground="Yellow"></Label>
+                <TextBlock Name="LingminduJieGuo2" Canvas.Top="250" Canvas.Left="480"  FontSize="15" Width="30"></TextBlock>
+                <TextBlock Name="LingminduJieGuo1" Canvas.Top="300" Canvas.Left="480"  FontSize="15" Width="30"></TextBlock>
+                <Label Canvas.Bottom="50" Canvas.Left="2" Content="红色:NG&#13;绿色:OK&#13;白色:清空&#13;灰色:无结果" Foreground="Yellow" FontWeight="Bold"></Label>
             </Canvas>
             <Grid Name="AlarmGrid" Grid.Row="1" Background="Red">
                 <TextBlock Name="AlarmTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="26"></TextBlock>
