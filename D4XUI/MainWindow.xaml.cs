@@ -21,6 +21,7 @@ using BingLibrary.hjb.tools;
 using OfficeOpenXml;
 using System.IO;
 using System.Diagnostics;
+using BingLibrary.hjb;
 
 namespace D4XUI
 {
@@ -935,6 +936,7 @@ namespace D4XUI
                         if (M10151)
                         {
                             LingminduJieGuo1.Background = Brushes.LightGreen;
+                            SaveResult(LingminduBarcode1.Text, "OK", "1");
                         }
                         else
                         {
@@ -947,6 +949,7 @@ namespace D4XUI
                         if (M10152)
                         {
                             LingminduJieGuo1.Background = Brushes.Red;
+                            SaveResult(LingminduBarcode1.Text, "NG", "1");
                         }
                         else
                         {
@@ -959,6 +962,7 @@ namespace D4XUI
                         if (M10153)
                         {
                             LingminduJieGuo2.Background = Brushes.LightGreen;
+                            SaveResult(LingminduBarcode2.Text, "OK", "2");
                         }
                         else
                         {
@@ -971,6 +975,7 @@ namespace D4XUI
                         if (M10154)
                         {
                             LingminduJieGuo2.Background = Brushes.Red;
+                            SaveResult(LingminduBarcode2.Text, "NG", "2");
                         }
                         else
                         {
@@ -985,6 +990,23 @@ namespace D4XUI
 
 
         #endregion
+        private void SaveResult(string bar,string rst,string index)
+        {
+            try
+            {
+                if (!Directory.Exists("C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd")))
+                {
+                    Directory.CreateDirectory(@"C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd"));
+                }
+                string path = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMdd") + "Barcode.csv";
+                Csvfile.savetocsv(path,new string[] { DateTime.Now.ToString(), bar , rst , index });
+            }
+            catch
+            {
+
+            }
+
+        }
         //private void Button_Click(object sender, RoutedEventArgs e)
         //{
 

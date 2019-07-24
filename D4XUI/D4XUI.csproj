@@ -61,6 +61,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Async.cs" />
+    <Compile Include="Csvfile.cs" />
     <Compile Include="Inifile.cs" />
     <Compile Include="ThingetPLC.cs" />
     <Compile Include="UDP.cs" />
