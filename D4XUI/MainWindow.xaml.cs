@@ -724,52 +724,71 @@ namespace D4XUI
                     //}
                     try
                     {
+                        //SN1:G5Y9301RDD0K9037V-GF,P;SN2:G5Y9301RDCNK9037A-GF,P
+                        //SN1:,;SN2:G5Y930432L2L65K5M-GF,P;49
                         string[] s1 = rs.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                         string[] s1_1 = s1[0].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                         if (s1_1[0] == "SN1" && s1_1.Length == 2)
                         {
-                            //SN1:G5Y9301RDD0K9037V-GF,P;SN2:G5Y9301RDCNK9037A-GF,P
-                            string[] s1_1_1 = s1_1[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                            ZhuanpanBarcode1.Text = s1_1_1[0];
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
-                            if (s1_1_1.Length == 2)
+                            try
                             {
-                                if (s1_1_1[1] == "P")
+                                string[] s1_1_1 = s1_1[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                                ZhuanpanBarcode1.Text = s1_1_1[0];
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
+                                if (s1_1_1.Length == 2)
                                 {
-                                    ZhuanpanBarcode1.Background = Brushes.GreenYellow;
+                                    if (s1_1_1[1] == "P")
+                                    {
+                                        ZhuanpanBarcode1.Background = Brushes.GreenYellow;
+                                    }
+                                    else
+                                    {
+                                        ZhuanpanBarcode1.Background = Brushes.Red;
+                                    }
                                 }
                                 else
                                 {
-                                    ZhuanpanBarcode1.Background = Brushes.Red;
+                                    ZhuanpanBarcode1.Background = Brushes.Gray;
                                 }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                ZhuanpanBarcode1.Background = Brushes.Gray;
+                                AddMessage(ex.Message);
+
                             }
+                            
                         }
                         string[] s1_2 = s1[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
                         if (s1_2[0] == "SN2" && s1_2.Length == 2)
                         {
-                            string[] s1_2_1 = s1_2[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                            ZhuanpanBarcode2.Text = s1_2_1[0];
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
-
-                            if (s1_2_1.Length == 2)
+                            try
                             {
-                                if (s1_2_1[1] == "P")
+                                string[] s1_2_1 = s1_2[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                                ZhuanpanBarcode2.Text = s1_2_1[0];
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
+
+                                if (s1_2_1.Length == 2)
                                 {
-                                    ZhuanpanBarcode2.Background = Brushes.GreenYellow;
+                                    if (s1_2_1[1] == "P")
+                                    {
+                                        ZhuanpanBarcode2.Background = Brushes.GreenYellow;
+                                    }
+                                    else
+                                    {
+                                        ZhuanpanBarcode2.Background = Brushes.Red;
+                                    }
                                 }
                                 else
                                 {
-                                    ZhuanpanBarcode2.Background = Brushes.Red;
+                                    ZhuanpanBarcode2.Background = Brushes.Gray;
                                 }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                ZhuanpanBarcode2.Background = Brushes.Gray;
+
+                                AddMessage(ex.Message);
                             }
+                            
 
                         }
                     }
