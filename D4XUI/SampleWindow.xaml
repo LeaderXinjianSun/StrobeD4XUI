@@ -1,0 +1,110 @@
+﻿<Window x:Class="D4XUI.SampleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:D4XUI"
+        mc:Ignorable="d"
+        Title="SampleWindow" Height="300" Width="400" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Loaded="Window_Loaded">
+    <Grid>
+        <Grid Name="PasswordGrid"  Visibility="Visible">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="请输入密码"></TextBlock>
+                <TextBox Name="PassWord" Margin="1" KeyDown="TextBox_KeyDown" Width="200"></TextBox>
+            </StackPanel>
+        </Grid>
+        <Grid Name="ContentGrid" Visibility="Collapsed">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="序号" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Text="1" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"></TextBlock>
+                <TextBlock Text="2" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2"></TextBlock>
+                <TextBlock Text="3" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3"></TextBlock>
+                <TextBlock Text="4" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4"></TextBlock>
+                <TextBlock Text="5" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5"></TextBlock>
+                <TextBlock Text="6" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="6"></TextBlock>
+                <TextBlock Text="7" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="7"></TextBlock>
+                <TextBlock Text="8" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="8"></TextBlock>
+                <TextBlock Text="9" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="9"></TextBlock>
+                <TextBlock Text="10" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="10"></TextBlock>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Text="不良项"></TextBlock>
+                <TextBox Name="NGItem1" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem1" Margin="1"></TextBox>
+                <TextBox Name="NGItem2" Grid.Row="2" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem2" Margin="1"></TextBox>
+                <TextBox Name="NGItem3" Grid.Row="3" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem3" Margin="1"></TextBox>
+                <TextBox Name="NGItem4" Grid.Row="4" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem4" Margin="1"></TextBox>
+                <TextBox Name="NGItem5" Grid.Row="5" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem5" Margin="1"></TextBox>
+                <TextBox Name="NGItem6" Grid.Row="6" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem6" Margin="1"></TextBox>
+                <TextBox Name="NGItem7" Grid.Row="7" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem7" Margin="1"></TextBox>
+                <TextBox Name="NGItem8" Grid.Row="8" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem8" Margin="1"></TextBox>
+                <TextBox Name="NGItem9" Grid.Row="9" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem9" Margin="1"></TextBox>
+                <TextBox Name="NGItem10" Grid.Row="10" Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="NGItem10" Margin="1"></TextBox>
+                
+                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="种类"></TextBlock>
+                <ComboBox Name="NGItemClassify1" Grid.Column="2" Width="50" Grid.Row="1" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify2" Grid.Column="2" Width="50" Grid.Row="2" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify3" Grid.Column="2" Width="50" Grid.Row="3" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify4" Grid.Column="2" Width="50" Grid.Row="4" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify5" Grid.Column="2" Width="50" Grid.Row="5" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify6" Grid.Column="2" Width="50" Grid.Row="6" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify7" Grid.Column="2" Width="50" Grid.Row="7" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify8" Grid.Column="2" Width="50" Grid.Row="8" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify9" Grid.Column="2" Width="50" Grid.Row="9" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <ComboBox Name="NGItemClassify10" Grid.Column="2" Width="50" Grid.Row="10" Margin="1">
+                    <ComboBoxItem>ZP</ComboBoxItem>
+                    <ComboBoxItem>FCT</ComboBoxItem>
+                </ComboBox>
+                <CheckBox Name="IsSampleCheck" Grid.Column="3" Content="允许样本" VerticalAlignment="Center" HorizontalAlignment="Center"></CheckBox>
+                <StackPanel HorizontalAlignment="Center" Grid.Column="3" Grid.Row="1" Orientation="Horizontal">
+                    <TextBlock Text="不良项数" VerticalAlignment="Center"></TextBlock>
+                    <TextBox Name="NGItemCount" Margin="1" Width="50" Text="9" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 2019073001" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="D4XUI 2019082201" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -22,24 +22,28 @@
                 <ImageBrush ImageSource="D4X俯视图截图01.jpg"></ImageBrush>
             </Grid.Background>
             <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="50"></RowDefinition>
             </Grid.RowDefinitions>
-            <Canvas>
-                <TextBlock Name="ZhuanpanBarcode2" Canvas.Top="100" Canvas.Left="10" FontWeight="Bold" Background="White" FontSize="15" Text="Zhuanpanbarcode2"></TextBlock>
-                <TextBlock Name="ZhuanpanBarcode1" Canvas.Top="150" Canvas.Left="10" FontWeight="Bold" Background="White" FontSize="15" Text="Zhuanpanbarcode1"></TextBlock>
-                <TextBlock Name="SimoBarcode2" Canvas.Top="100" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Simobarcode2"></TextBlock>
-                <TextBlock Name="SimoBarcode1" Canvas.Top="150" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Simobarcode1"></TextBlock>
-                <TextBlock Name="LingminduBarcode2" Canvas.Top="250" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Lingmindubarcode2"></TextBlock>
-                <TextBlock Name="LingminduBarcode1" Canvas.Top="300" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Lingmindubarcode1"></TextBlock>
+            <Canvas Grid.Row="1">
+                <TextBlock Name="ZhuanpanBarcode2" Canvas.Top="50" Canvas.Left="10" FontWeight="Bold" Background="White" FontSize="15" Text="Zhuanpanbarcode2"></TextBlock>
+                <TextBlock Name="ZhuanpanBarcode1" Canvas.Top="100" Canvas.Left="10" FontWeight="Bold" Background="White" FontSize="15" Text="Zhuanpanbarcode1"></TextBlock>
+                <TextBlock Name="SimoBarcode2" Canvas.Top="50" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Simobarcode2"></TextBlock>
+                <TextBlock Name="SimoBarcode1" Canvas.Top="100" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Simobarcode1"></TextBlock>
+                <TextBlock Name="LingminduBarcode2" Canvas.Top="200" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Lingmindubarcode2"></TextBlock>
+                <TextBlock Name="LingminduBarcode1" Canvas.Top="250" Canvas.Left="295" FontWeight="Bold" Background="White" FontSize="15" Text="Lingmindubarcode1"></TextBlock>
                 <!--<TextBlock Text="灵敏度左穴样本匹配结果" Width="100" Canvas.Top="230" Canvas.Left="480"></TextBlock>
                 <TextBlock Text="灵敏度右穴样本匹配结果" Width="100" Canvas.Top="280" Canvas.Left="480"></TextBlock>-->
-                <TextBlock Name="LingminduJieGuo2" Canvas.Top="250" Canvas.Left="520"  FontSize="15" Width="30" Background="White"></TextBlock>
-                <TextBlock Name="LingminduJieGuo1" Canvas.Top="300" Canvas.Left="520"  FontSize="15" Width="30" Background="White"></TextBlock>
+                <TextBlock Name="LingminduJieGuo2" Canvas.Top="200" Canvas.Left="520"  FontSize="15" Width="30" Background="White"></TextBlock>
+                <TextBlock Name="LingminduJieGuo1" Canvas.Top="250" Canvas.Left="520"  FontSize="15" Width="30" Background="White"></TextBlock>
                 <Label Canvas.Bottom="50" Canvas.Left="2" Content="红色:NG&#13;绿色:OK&#13;白色:清空&#13;灰色:无结果" Foreground="Yellow" FontWeight="Bold"></Label>
             </Canvas>
-            <Grid Name="AlarmGrid" Grid.Row="1" Background="Red">
+            <Grid Name="AlarmGrid" Grid.Row="2" Background="Red">
                 <TextBlock Name="AlarmTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="26"></TextBlock>
+            </Grid>
+            <Grid Name="SampleGrid" Background="GreenYellow">
+                <TextBlock Name="SampleTextBlock" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="26"></TextBlock>
             </Grid>
         </Grid>
         <TextBox Margin="1" x:Name="MsgTextBox" Grid.Row="1" IsReadOnly="True" TextChanged="MsgTextBox_TextChanged"  FontSize="14" Background="Black" FontFamily="宋体" Foreground="White" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0"></TextBox>
@@ -48,6 +52,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"></RowDefinition>
                 <RowDefinition></RowDefinition>
+                <RowDefinition Height="100"></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel VerticalAlignment="Center">
                 <!--<Button Width="80" Height="30" Content="功能" Click="Button_Click"></Button>-->
@@ -188,6 +193,16 @@
                     </StackPanel>-->
                 </StackPanel>
             </Grid>
+            <Grid Grid.Row="2">
+                <Canvas>
+                    <Button Name="SampleButton" Canvas.Left="10" Canvas.Top="10" Height="30" Width="80" Content="样本" Click="SampleButton_Click"></Button>
+                    <StackPanel Canvas.Left="10" Canvas.Top="50" Orientation="Vertical">
+                        <TextBlock Text="上次测样本时刻:"></TextBlock>
+                        <TextBlock Name="LastSampleTime"></TextBlock>
+                    </StackPanel>
+                    <Button Name="FuncButton" Canvas.Left="100" Canvas.Top="10" Height="30" Width="80" Content="功能" Click="FuncButton_Click"></Button>
+                </Canvas>
+            </Grid>
         </Grid>
             
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
@@ -195,6 +210,7 @@
             <Ellipse Name="PLCStatusEllipse" Width="20" Height="20"></Ellipse>
             <Label>Cycle</Label>
             <TextBlock Name="CycleText"></TextBlock>
+            
         </StatusBar>
     </Grid>
 </Window>

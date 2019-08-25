@@ -22,6 +22,8 @@ using OfficeOpenXml;
 using System.IO;
 using System.Diagnostics;
 using BingLibrary.hjb;
+using 臻鼎科技OraDB;
+using System.Data;
 
 namespace D4XUI
 {
@@ -52,6 +54,8 @@ namespace D4XUI
         string S_LingminduJieGuo2 = "";
         Double UPH;
         int tick = 0;
+        DateTime LasSam, NowSam;
+        public static SampleWindow SampleWindow = null;
         #endregion
         public MainWindow()
         {
@@ -274,11 +278,79 @@ namespace D4XUI
                     //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Zhuanpan", ProperRate_Zhuanpan.Text);
                     //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Lingmindu", ProperRate_Lingmindu.Text);
                     //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Tiemoji", ProperRate_Tiemoji.Text);
-                    #endregion
+                   
                 }
+                #endregion
+                #region 样本
+                DateTime SamStartDatetime, SamDate, SamDateBigin;
+                if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
+                {
+                    //上午
+                    SamStartDatetime = Convert.ToDateTime("08:00:00");
+                    SamDate = Convert.ToDateTime("07:00:00");
+                    SamDateBigin = Convert.ToDateTime("06:00:00");
+                }
+                else
+                {
+                    if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
+                    {
+                        //下午
+                        SamStartDatetime = Convert.ToDateTime("14:00:00");
+                        SamDate = Convert.ToDateTime("13:00:00");
+                        SamDateBigin = Convert.ToDateTime("12:00:00");
+                    }
+                    else
+                    {
+                        if (DateTime.Now.Hour >= 18)
+                        {
+                            //前夜
+                            SamStartDatetime = Convert.ToDateTime("20:00:00");
+                            SamDate = Convert.ToDateTime("19:00:00");
+                            SamDateBigin = Convert.ToDateTime("18:00:00");
+                        }
+                        else
+                        {
+                            //后夜
+                            SamStartDatetime = Convert.ToDateTime("02:00:00");
+                            SamDate = Convert.ToDateTime("01:00:00");
+                            SamDateBigin = Convert.ToDateTime("00:00:00");
+                        }
+                    }
+                }
+                SampleGrid.Visibility = (DateTime.Now - SamDate).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample || (IsInSampleMode && !SampleTestAbort) ? Visibility.Visible : Visibility.Collapsed;
+                SampleTextBlock.Text = IsInSampleMode ? "样本测试中" : "请测样本";
+                if (!SampleTestAbort && !IsInSampleMode && (DateTime.Now - SamStartDatetime).TotalSeconds > 0 && IsSample && (SamDateBigin - LasSam).TotalSeconds > 0 && plcstate)
+                {
+                    Xinjie.SetM(10110, true);
+                    Xinjie.SetM(10112, false);
+                    SampleTestFinished = false;
+                    SampleBarcode.Clear();
+                    NowSam = DateTime.Now;
+                    AddMessage("开始样本测试");
+                }
+                if (IsInSampleMode && SampleTestFinished)
+                {
+                    bool res = CheckSampleFromDt();
+                    Xinjie.SetM(10114, !res);
+                    Xinjie.SetM(10110, false);
+                    if (res)
+                    {
+                        AddMessage("样本测试成功");
+                        LasSam = DateTime.Now;
+                        LastSampleTime.Text = LasSam.ToString();
+                        Inifile.INIWriteValue(iniParameterPath, "Sample", "LastSample", LasSam.ToString());
+                    }
+                    else
+                    {
+                        NowSam = DateTime.Now;
+                        AddMessage("样本测试失败");
+                    }
+                    Xinjie.SetM(10115, true);
+                }
+                #endregion
             }
-        }
 
+        }
         private void WriteMachineData()
         {
             string excelpath = @"D:\D4XMachineData.xlsx";
@@ -403,13 +475,6 @@ namespace D4XUI
         //        AddMessage(ex.Message);
         //    }
         //}
-
-
-
-
-
-
-
         public void AddMessage(string str)
         {
             string[] s = MessageStr.Split('\n');
@@ -425,6 +490,7 @@ namespace D4XUI
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            ConnectDBTest();
             UDPInit();
             LoadParameter();
             Async.RunFuncAsync(PLCWork, null);
@@ -435,6 +501,7 @@ namespace D4XUI
             AddMessage("加载完成");
             dispatcherTimer.Start();
             UDPWork();
+            NowSam = DateTime.Now;
         }
         private void LoadAlarmNames()
         {
@@ -589,6 +656,15 @@ namespace D4XUI
             SimoBarcode2.Text = Inifile.INIGetStringValue(iniParameterPath, "Barcode", "SimoBarcode2", "null");
             LingminduBarcode1.Text = Inifile.INIGetStringValue(iniParameterPath, "Barcode", "LingminduBarcode1", "null");
             LingminduBarcode2.Text = Inifile.INIGetStringValue(iniParameterPath, "Barcode", "LingminduBarcode2", "null");
+            LastSampleTime.Text = Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSample", "2019/1/1 00:00:00");
+            try
+            {
+                LasSam = Convert.ToDateTime(LastSampleTime.Text);
+            }
+            catch
+            {
+                LastSampleTime.Text = Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSample", "2019/1/1 00:00:00");
+            }
             //LingminduJieGuo1.Text = Inifile.INIGetStringValue(iniParameterPath, "JieGuo", "LingminduJieGuo1", "null");
             //LingminduJieGuo2.Text = Inifile.INIGetStringValue(iniParameterPath, "JieGuo", "LingminduJieGuo2", "null");
             try
@@ -598,6 +674,29 @@ namespace D4XUI
             catch
             {
                 UPH = 300;
+            }
+
+            string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";
+            try
+            {
+                IsSample = bool.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "IsSample", "True"));
+            }
+            catch
+            {
+                IsSample = true;
+            }
+            try
+            {
+                NGItemCount = int.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemCount", "9"));
+            }
+            catch
+            {
+                NGItemCount = 9;
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                NGItems[i, 0] = Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItem" + (i + 1).ToString(), "Null");
+                NGItems[i, 1] = Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemClassify" + (i + 1).ToString(), "Null");
             }
         }
         private string GetBanci()
@@ -627,9 +726,31 @@ namespace D4XUI
         ObservableCollection<bool> M10000;
         ObservableCollection<double> HD200;
         bool M10140 = false, M10141 = false, M10150 = false, M10151 = false, M10152 = false, M10153 = false, M10154 = false;
+
+
+
         bool M10142 = false, M10143 = false;
         bool M10144 = false, M10145 = false;
         bool M10146 = false, M10147 = false;
+
+        private void FuncButton_Click(object sender, RoutedEventArgs e)
+        {
+            //SampleBarcode.Clear();
+            //SampleBarcode.Add("G5Y796383C9LQ5919SAT");
+            //SampleBarcode.Add("G5Y9321RAH5K7QC8V-G");
+            //NowSam = Convert.ToDateTime("2019/8/16 18:45:16");
+            //var a = CheckSampleFromDt();
+            if (!SampleTestAbort && !IsInSampleMode && IsSample && plcstate)
+            {
+                Xinjie.SetM(10110, true);
+                Xinjie.SetM(10112, false);
+                SampleTestFinished = false;
+                SampleBarcode.Clear();
+                NowSam = DateTime.Now;
+                AddMessage("开始样本测试");
+            }
+        }
+
         bool M10148 = false, M10149 = false;
 
         double D1200;
@@ -689,7 +810,6 @@ namespace D4XUI
                 sw.Restart();
                 string rs = await udp1.ReceiveAsync();
 
-                await Task.Delay(2);
                 #region 从转盘接收条码
 
                 //string rs = await udp1.ReceiveAsync();
@@ -733,10 +853,15 @@ namespace D4XUI
                             try
                             {
                                 string[] s1_1_1 = s1_1[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                                ZhuanpanBarcode1.Text = s1_1_1[0];
-                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
-                                if (s1_1_1.Length == 2)
+                                if (s1_1_1.Length >= 2)
                                 {
+                                    ZhuanpanBarcode1.Text = s1_1_1[0];
+                                    if (SampleTestStart)
+                                    {
+                                        SampleBarcode.Add(s1_1_1[0]);
+                                    }
+                                    Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
+
                                     if (s1_1_1[1] == "P")
                                     {
                                         ZhuanpanBarcode1.Background = Brushes.GreenYellow;
@@ -748,6 +873,8 @@ namespace D4XUI
                                 }
                                 else
                                 {
+                                    ZhuanpanBarcode1.Text = "null";
+                                    Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
                                     ZhuanpanBarcode1.Background = Brushes.Gray;
                                 }
                             }
@@ -764,11 +891,16 @@ namespace D4XUI
                             try
                             {
                                 string[] s1_2_1 = s1_2[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                                ZhuanpanBarcode2.Text = s1_2_1[0];
-                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
-
-                                if (s1_2_1.Length == 2)
+                                if (s1_2_1.Length >= 2)
                                 {
+                                    ZhuanpanBarcode2.Text = s1_2_1[0];
+                                    if (SampleTestStart)
+                                    {
+                                        SampleBarcode.Add(s1_2_1[0]);
+                                    }
+                                    Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
+
+                            
                                     if (s1_2_1[1] == "P")
                                     {
                                         ZhuanpanBarcode2.Background = Brushes.GreenYellow;
@@ -777,11 +909,17 @@ namespace D4XUI
                                     {
                                         ZhuanpanBarcode2.Background = Brushes.Red;
                                     }
+                                 
+
                                 }
                                 else
                                 {
+                                    ZhuanpanBarcode2.Text = "null";
+                                    Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
+
                                     ZhuanpanBarcode2.Background = Brushes.Gray;
                                 }
+
                             }
                             catch (Exception ex)
                             {
@@ -864,6 +1002,7 @@ namespace D4XUI
                 {
                     if (first)
                     {
+                        await Task.Delay(100);
                         first = false;
                         M10140 = M10000[140];//条码移动到吸爪
                         M10141 = M10000[141];//条码移动到灵敏度
@@ -874,6 +1013,17 @@ namespace D4XUI
                         M10152 = M10000[152];
                         M10153 = M10000[153];
                         M10154 = M10000[154];
+                    }
+                    IsInSampleMode = M10000[110];
+                    SampleTestAbort = M10000[111];
+                    SampleTestFinished = M10000[112];
+                    SampleTestStart = M10000[113];
+                    if (IsInSampleMode && SampleTestAbort)
+                    {
+                        AddMessage("样本测试中断");
+                        Xinjie.SetM(10110, false);
+                        IsInSampleMode = false;
+                        SampleBarcode.Clear();
                     }
                     if (M10140 != M10000[140])
                     {
@@ -1008,6 +1158,154 @@ namespace D4XUI
         }
 
 
+        #endregion
+        #region 数据库
+        private void ConnectDBTest()
+        {
+            try
+            {
+                OraDB oraDB = new OraDB("zdtdb", "ictdata", "ictdata*168");
+                if (oraDB.isConnect())
+                {
+                    string dbtime = oraDB.sfc_getServerDateTime();
+                    setLocalTime(dbtime);
+                    AddMessage("数据库连接" + dbtime);
+                }
+                else
+                {
+                    AddMessage("数据库未连接");
+                }
+                oraDB.disconnect();
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
+        }
+        private void setLocalTime(string strDateTime)
+        {
+            DateTimeUtility.SYSTEMTIME st = new DateTimeUtility.SYSTEMTIME();
+            DateTime dt = Convert.ToDateTime(strDateTime);
+            st.FromDateTime(dt);
+            DateTimeUtility.SetLocalTime(ref st);
+        }
+        #endregion
+        #region 样本
+        bool IsSample, IsInSampleMode = false,SampleTestAbort = false,SampleTestStart = false,SampleTestFinished = false; int NGItemCount; string[,] NGItems = new string[10,2];
+        List<string> SampleBarcode = new List<string>();
+        private void SampleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SampleWindow != null)
+            {
+                if (SampleWindow.HasShow)
+                    return;
+            }
+            SampleWindow = new SampleWindow();
+            SampleWindow.Owner = Application.Current.MainWindow;
+            SampleWindow.HasShow = true;
+            SampleWindow.Show();
+
+        }
+        private bool CheckSampleFromDt()
+        {
+            //条码、时间=>表格
+            //不良项目数量是否够？
+            try
+            {
+                if (SampleBarcode.Count > 0)
+                {
+                    OraDB oraDB = new OraDB("zdtdb", "ictdata", "ictdata*168");
+                    if (oraDB.isConnect())
+                    {
+                        //select* from barsamrec where barcode in ('G5Y796383C9LQ5919SAT','G5Y9321RAH5K7QC8V-G') and sdate > to_date('2019/8/16 18:45:16', 'yyyy/mm/dd hh24:mi:ss')
+                        string selectSqlStr = "select * from barsamrec where barcode in （";
+                        foreach (var item in SampleBarcode)
+                        {
+                            AddMessage(item);
+                            selectSqlStr += "'" + item + "',";
+                        }
+                        selectSqlStr = selectSqlStr.Substring(0, selectSqlStr.Length - 1);
+                        selectSqlStr += ") and sdate > to_date('" + NowSam.ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
+                        DataSet s = oraDB.selectSQL2(selectSqlStr);
+                        DataTable dt = s.Tables[0];
+                        string Columns = "";
+                        for (int i = 0; i < dt.Columns.Count - 1; i++)
+                        {
+                            Columns += dt.Columns[i].ColumnName + ",";
+                        }
+                        Columns += dt.Columns[dt.Columns.Count - 1].ColumnName;
+                        Csvfile.dt2csv(dt, "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Sample.csv", "Sample", Columns);
+
+                        try
+                        {
+                            Process process1 = new Process();
+                            process1.StartInfo.FileName = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Sample.csv";
+                            process1.StartInfo.Arguments = "";
+                            process1.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                            process1.Start();
+                        }
+                        catch (Exception ex)
+                        {
+                            AddMessage(ex.Message);
+                        }
+
+                        //匹配不良项数量是否满足
+                        int[] counts = new int[NGItemCount];
+                        for (int i = 0; i < NGItemCount; i++)
+                        {
+                            for (int j = 0; j < dt.Rows.Count; j++)
+                            {
+                                if (((string)dt.Rows[j]["NGITEM"]).Contains(NGItems[i, 0]) && NGItems[i, 1] == (string)dt.Rows[j]["SITEM"])
+                                {
+                                    counts[i]++;
+                                }
+                            }
+                        }
+                        for (int i = 0; i < NGItemCount; i++)
+                        {
+                            if (counts[i] <= 0)
+                            {
+                                AddMessage("样本测试数量不足");
+                                return false;
+                            }
+                        }
+                        //匹配是否测试正确
+                        for (int j = 0; j < dt.Rows.Count; j++)
+                        {
+                            if ((string)dt.Rows[j]["TRES"] != (string)dt.Rows[j]["NGITEM"])
+                            {
+                                AddMessage((string)dt.Rows[j]["BARCODE"] + "应该是" + (string)dt.Rows[j]["NGITEM"] + ",却测成了" + (string)dt.Rows[j]["TRES"]);
+                            }
+                        }
+                        for (int j = 0; j < dt.Rows.Count; j++)
+                        {
+                            if ((string)dt.Rows[j]["TRES"] != (string)dt.Rows[j]["NGITEM"])
+                            {
+                                return false;
+                            }
+                        }
+                        oraDB.disconnect();
+                        return true;
+                    }
+                    else
+                    {
+                        AddMessage("数据库连接失败");
+                        return false;
+                    }
+                }
+                else
+                {
+                    AddMessage("条码数量为零");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+                return false;
+            }
+            
+        }
         #endregion
         private void SaveResult(string bar,string rst,string index)
         {
