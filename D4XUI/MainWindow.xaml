@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 2019082201" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="D4XUI 2019083001" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -60,7 +60,7 @@
             </StackPanel>
             <Grid Grid.Row="1">
                 <StackPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
+                    <!--<StackPanel Orientation="Horizontal">
                         <TextBlock Text="上料机生产时间" Width="100"></TextBlock>
                         <TextBlock Name="Downtime" Width="60"></TextBlock>
                         <TextBlock Text="min" Width="30"></TextBlock>
@@ -84,7 +84,7 @@
                         <TextBlock Text="贴膜机故障时间" Width="100"></TextBlock>
                         <TextBlock Name="Tiemojidowntime" Width="60"></TextBlock>
                         <TextBlock Text="min" Width="30"></TextBlock>
-                    </StackPanel>
+                    </StackPanel>-->
                     <!--StackPanel Orientation="Horizontal">
                         <TextBlock Text="等待上料转盘时间" Width="100"></TextBlock>
                         <TextBlock Name="Waitzhuanpanforinput" Width="60"></TextBlock>

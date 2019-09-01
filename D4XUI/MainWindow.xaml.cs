@@ -89,250 +89,80 @@ namespace D4XUI
                     }
                 }
             }
-            if (AlarmGrid.Visibility == Visibility.Visible)
+            //if (AlarmGrid.Visibility == Visibility.Visible)
+            //{
+            //    Inifile.INIWriteValue(iniFClient, "Alarm", "Name", AlarmTextBlock.Text);
+            //}
+            //else
+            //{
+            //    Inifile.INIWriteValue(iniFClient, "Alarm", "Name", "NULL");
+            //}
+            #region 样本
+            DateTime SamStartDatetime, SamDate, SamDateBigin;
+            if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
             {
-                Inifile.INIWriteValue(iniFClient, "Alarm", "Name", AlarmTextBlock.Text);
+                //上午
+                SamStartDatetime = Convert.ToDateTime("08:00:00");
+                SamDate = Convert.ToDateTime("07:00:00");
+                SamDateBigin = Convert.ToDateTime("06:00:00");
             }
             else
             {
-                Inifile.INIWriteValue(iniFClient, "Alarm", "Name", "NULL");
-            }
-            if (++tick >= 60)
-            {
-                tick = 0;
-                #region 及时雨
-                if (M10000 != null && plcstate)
+                if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
                 {
-                    if (LastBanci != GetBanci())
-                    {
-                        LastBanci = GetBanci();
-                        Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
-                        AddMessage(LastBanci + " 换班数据清零");
-                        WriteMachineData();
-                        downtime = 0;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString("F1"));
-                        zhuanpandowntime = 0;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString("F1"));
-                        lingmindudowntime = 0;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString("F1"));
-                        tiemojidowntime = 0;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString("F1"));
-                        waitzhuanpanforinput = 0;
-                        //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString("F1"));
-                        //waitlingminduforinput = 0;
-                        //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitlingminduforinput", waitlingminduforinput.ToString("F1"));
-                        //WaitTiemojiforinput = 0;
-                        //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "WaitTiemojiforinput", WaitTiemojiforinput.ToString("F1"));
-                        waitfortake = 0;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString("F1"));
-                        //worktime = 0;
-                        //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Worktime", worktime.ToString("F1"));
-                        //runtime = 0;
-                        //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Runtime", runtime.ToString("F1"));
-
-                        Xinjie.SetM(10099, true);//通知PLC换班，计数清空
-                    }
-                    if (D1200 == 1 && DangbanFirstProduct != GetBanci())
-                    {
-                        DangbanFirstProduct = GetBanci();
-                        Inifile.INIWriteValue(iniParameterPath, "Summary", "DangbanFirstProduct", DangbanFirstProduct);
-                        AddMessage(DangbanFirstProduct + " 开始生产");
-                    }
-                    if (M10000[100] && DangbanFirstProduct == GetBanci())
-                    {
-                        downtime += 0.1;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString("F1"));
-                    }
-                    if (M10000[101] && DangbanFirstProduct == GetBanci())
-                    {
-                        zhuanpandowntime += 0.1;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString("F1"));
-                    }
-                    if (M10000[102] && DangbanFirstProduct == GetBanci())
-                    {
-                        lingmindudowntime += 0.1;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString("F1"));
-                    }
-                    if (M10000[103] && DangbanFirstProduct == GetBanci())
-                    {
-                        tiemojidowntime += 0.1;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString("F1"));
-                    }
-                    //if (M10000[104] && DangbanFirstProduct == GetBanci())
-                    //{
-                    //    waitzhuanpanforinput += 0.1;
-                    //    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString("F1"));
-                    //}
-                    //if (M10000[105] && DangbanFirstProduct == GetBanci())
-                    //{
-                    //    waitlingminduforinput += 0.1;
-                    //    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitlingminduforinput", waitlingminduforinput.ToString("F1"));
-                    //}
-                    //if (M10000[106] && DangbanFirstProduct == GetBanci())
-                    //{
-                    //    waitTiemojiforinput += 0.1;
-                    //    Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "WaitTiemojiforinput", waitTiemojiforinput.ToString("F1"));
-                    //}
-                    if (M10000[107] && DangbanFirstProduct == GetBanci())
-                    {
-                        waitfortake += 0.1;
-                        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString("F1"));
-                    }
-                    //    input.Text = HD200[0].ToString();
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "input", input.Text);
-                    //    output.Text = HD200[1].ToString();
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "output", output.Text);
-                    //    TestCount_Total.Text = HD200[2].ToString();
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_Total", TestCount_Total.Text);
-                    //    PassCount_Total.Text = HD200[3].ToString();
-                    //    if (HD200[2] == 0)
-                    //    {
-                    //        Yield_Total.Text = "0";
-                    //    }
-                    //    else
-                    //    {
-                    //        Yield_Total.Text = (HD200[3] / HD200[2] * 100).ToString("F1");
-                    //    }
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "Yield_Total", Yield_Total.Text);
-                    //    TestCount_1.Text = HD200[4].ToString();
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_1", TestCount_1.Text);
-                    //    PassCount_1.Text = HD200[5].ToString();
-                    //    if (HD200[4] == 0)
-                    //    {
-                    //        Yield_1.Text = "0";
-                    //    }
-                    //    else
-                    //    {
-                    //        Yield_1.Text = (HD200[5] / HD200[4] * 100).ToString("F1");
-                    //    }
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "Yield_1", Yield_1.Text);
-
-                    TestCount_2.Text = HD200[6].ToString();
-                    Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_2", TestCount_2.Text);
-                    PassCount_2.Text = HD200[3].ToString();
-                    if (HD200[6] == 0)
-                    {
-                        Yield_2.Text = "0";
-                    }
-                    else
-                    {
-                        Yield_2.Text = (HD200[3] / HD200[6] * 100).ToString("F1");
-                    }
-                    Inifile.INIWriteValue(iniFClient, "DataList", "Yield_2", Yield_2.Text);
-                    //    AlarmCount.Text = HD200[8].ToString();
-                    //    Inifile.INIWriteValue(iniFClient, "Alarm", "count", AlarmCount.Text);
-                    //    Inifile.INIWriteValue(iniFClient, "state", "state", D1200.ToString());
-
-                    //    if (DangbanFirstProduct == GetBanci())
-                    //    {
-                    //        worktime += 0.1;
-                    //        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Worktime", worktime.ToString());
-                    //    }
-                    //    if (DangbanFirstProduct == GetBanci() && D1200 == 1)
-                    //    {
-                    //        runtime += 0.1;
-                    //        Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Runtime", runtime.ToString());
-                    //    }
-                    //    if (runtime == 0 || UPH == 0)
-                    //        AchievingRate.Text = "100";
-                    //    else
-                    //        AchievingRate.Text = (HD200[1] / (UPH / 60 * runtime) * 100).ToString("F1");
-                    //    Inifile.INIWriteValue(iniFClient, "DataList", "AchievingRate", AchievingRate.Text);
-
-                    //}
-                    Downtime.Text = downtime.ToString("F1");
-                    Zhuanpandowntime.Text = zhuanpandowntime.ToString("F1");
-                    Lingmindudowntime.Text = lingmindudowntime.ToString("F1");
-                    Tiemojidowntime.Text = tiemojidowntime.ToString("F1");
-                    //Waitzhuanpanforinput.Text = waitzhuanpanforinput.ToString("F1");
-                    //Waitlingminduforinput.Text = waitlingminduforinput.ToString("F1");
-                    //WaitTiemojiforinput.Text = waitTiemojiforinput.ToString("F1");
-                    Waitfortake.Text = waitfortake.ToString("F1");
-                    Inifile.INIWriteValue(iniFClient, "DataList", "Downtime", downtime.ToString("F1"));
-                    Inifile.INIWriteValue(iniFClient, "DataList", "Zhuanpandowntime", zhuanpandowntime.ToString("F1"));
-                    Inifile.INIWriteValue(iniFClient, "DataList", "Lingmindudowntime", lingmindudowntime.ToString("F1"));
-                    Inifile.INIWriteValue(iniFClient, "DataList", "Tiemojidowntime", tiemojidowntime.ToString("F1"));
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "Waitzhuanpanforinput", waitzhuanpanforinput.ToString("F1"));
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "Waitlingminduforinput", waitlingminduforinput.ToString("F1"));
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "WaitTiemojiforinput", waitTiemojiforinput.ToString("F1"));
-                    Inifile.INIWriteValue(iniFClient, "DataList", "Waitfortake", waitfortake.ToString("F1"));
-
-                    //if (worktime == 0)
-                    //{
-                    //    ProperRate.Text = "0";
-                    //    ProperRate_AutoMation.Text = "0";
-                    //    ProperRate_Zhuanpan.Text = "0";
-                    //    ProperRate_Lingmindu.Text = "0";
-                    //    ProperRate_Tiemoji.Text = "0";
-                    //}
-                    //else
-                    //{
-                    //    ProperRate.Text = ((1 - (downtime + zhuanpandowntime + lingmindudowntime + tiemojidowntime) / worktime) * 100).ToString("F1");
-                    //    ProperRate_AutoMation.Text = ((1 - downtime / worktime) * 100).ToString("F1");
-                    //    ProperRate_Zhuanpan.Text = ((1 - zhuanpandowntime / worktime) * 100).ToString("F1");
-                    //    ProperRate_Lingmindu.Text = ((1 - lingmindudowntime / worktime) * 100).ToString("F1");
-                    //    ProperRate_Tiemoji.Text = ((1 - tiemojidowntime / worktime) * 100).ToString("F1");
-                    //}
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate", ProperRate.Text);
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_AutoMation", ProperRate_AutoMation.Text);
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Zhuanpan", ProperRate_Zhuanpan.Text);
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Lingmindu", ProperRate_Lingmindu.Text);
-                    //Inifile.INIWriteValue(iniFClient, "DataList", "ProperRate_Tiemoji", ProperRate_Tiemoji.Text);
-                   
-                }
-                #endregion
-                #region 样本
-                DateTime SamStartDatetime, SamDate, SamDateBigin;
-                if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
-                {
-                    //上午
-                    SamStartDatetime = Convert.ToDateTime("08:00:00");
-                    SamDate = Convert.ToDateTime("07:00:00");
-                    SamDateBigin = Convert.ToDateTime("06:00:00");
+                    //下午
+                    SamStartDatetime = Convert.ToDateTime("14:00:00");
+                    SamDate = Convert.ToDateTime("13:00:00");
+                    SamDateBigin = Convert.ToDateTime("12:00:00");
                 }
                 else
                 {
-                    if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
+                    if (DateTime.Now.Hour >= 18)
                     {
-                        //下午
-                        SamStartDatetime = Convert.ToDateTime("14:00:00");
-                        SamDate = Convert.ToDateTime("13:00:00");
-                        SamDateBigin = Convert.ToDateTime("12:00:00");
+                        //前夜
+                        SamStartDatetime = Convert.ToDateTime("20:00:00");
+                        SamDate = Convert.ToDateTime("19:00:00");
+                        SamDateBigin = Convert.ToDateTime("18:00:00");
                     }
                     else
                     {
-                        if (DateTime.Now.Hour >= 18)
-                        {
-                            //前夜
-                            SamStartDatetime = Convert.ToDateTime("20:00:00");
-                            SamDate = Convert.ToDateTime("19:00:00");
-                            SamDateBigin = Convert.ToDateTime("18:00:00");
-                        }
-                        else
-                        {
-                            //后夜
-                            SamStartDatetime = Convert.ToDateTime("02:00:00");
-                            SamDate = Convert.ToDateTime("01:00:00");
-                            SamDateBigin = Convert.ToDateTime("00:00:00");
-                        }
+                        //后夜
+                        SamStartDatetime = Convert.ToDateTime("02:00:00");
+                        SamDate = Convert.ToDateTime("01:00:00");
+                        SamDateBigin = Convert.ToDateTime("00:00:00");
                     }
+                }
+            }
+            if (M10000 != null && plcstate)
+            {
+                IsInSampleMode = M10000[110];
+                SampleTestAbort = M10000[111];
+                SampleTestFinished = M10000[112];
+                SampleTestStart = M10000[113];
+                if (IsInSampleMode && SampleTestAbort)
+                {
+                    AddMessage("样本测试中断");
+                    Xinjie.SetM(11110, false);
+                    IsInSampleMode = false;
+                    SampleBarcode.Clear();
                 }
                 SampleGrid.Visibility = (DateTime.Now - SamDate).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample || (IsInSampleMode && !SampleTestAbort) ? Visibility.Visible : Visibility.Collapsed;
                 SampleTextBlock.Text = IsInSampleMode ? "样本测试中" : "请测样本";
-                if (!SampleTestAbort && !IsInSampleMode && (DateTime.Now - SamStartDatetime).TotalSeconds > 0 && IsSample && (SamDateBigin - LasSam).TotalSeconds > 0 && plcstate)
+                if (!SampleTestAbort && !IsInSampleMode && (DateTime.Now - SamStartDatetime).TotalSeconds > 0 && IsSample && (SamDateBigin - LasSam).TotalSeconds > 0)
                 {
-                    Xinjie.SetM(10110, true);
-                    Xinjie.SetM(10112, false);
+                    Xinjie.SetM(11110, true);
+                    Xinjie.SetM(11112, false);
                     SampleTestFinished = false;
                     SampleBarcode.Clear();
                     NowSam = DateTime.Now;
                     AddMessage("开始样本测试");
+
                 }
                 if (IsInSampleMode && SampleTestFinished)
                 {
                     bool res = CheckSampleFromDt();
-                    Xinjie.SetM(10114, !res);
-                    Xinjie.SetM(10110, false);
+                    Xinjie.SetM(11114, !res);
+                    Xinjie.SetM(11110, false);
                     if (res)
                     {
                         AddMessage("样本测试成功");
@@ -345,96 +175,200 @@ namespace D4XUI
                         NowSam = DateTime.Now;
                         AddMessage("样本测试失败");
                     }
-                    Xinjie.SetM(10115, true);
+                    Xinjie.SetM(11115, true);
                 }
-                #endregion
             }
+            
+            #endregion
+            if (HD200 != null && plcstate)
+            {
+                TestCount_2.Text = HD200[6].ToString();
+                PassCount_2.Text = HD200[3].ToString();
+                if (HD200[6] == 0)
+                {
+                    Yield_2.Text = "0";
+                }
+                else
+                {
+                    Yield_2.Text = (HD200[3] / HD200[6] * 100).ToString("F1");
+                }
+            }
+
+            #region 换班
+            if (LastBanci != GetBanci())
+            {
+                LastBanci = GetBanci();
+                Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
+                AddMessage(LastBanci + " 换班数据清零");
+                //WriteMachineData();
+                //downtime = 0;
+                //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString("F1"));
+                //zhuanpandowntime = 0;
+                //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString("F1"));
+                //lingmindudowntime = 0;
+                //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString("F1"));
+                //tiemojidowntime = 0;
+                //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString("F1"));
+                //waitzhuanpanforinput = 0;
+                //waitfortake = 0;
+                //Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString("F1"));
+                Xinjie.SetM(11099, true);//通知PLC换班，计数清空
+            }
+            #endregion
+            //if (++tick >= 60)
+            //{
+            //    tick = 0;
+            //    #region 及时雨
+            //    if (M10000 != null && plcstate)
+            //    {
+            //        if (D1200 == 1 && DangbanFirstProduct != GetBanci())
+            //        {
+            //            DangbanFirstProduct = GetBanci();
+            //            Inifile.INIWriteValue(iniParameterPath, "Summary", "DangbanFirstProduct", DangbanFirstProduct);
+            //            AddMessage(DangbanFirstProduct + " 开始生产");
+            //        }
+            //        if (M10000[100] && DangbanFirstProduct == GetBanci())
+            //        {
+            //            downtime += 0.1;
+            //            Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Downtime", downtime.ToString("F1"));
+            //        }
+            //        if (M10000[101] && DangbanFirstProduct == GetBanci())
+            //        {
+            //            zhuanpandowntime += 0.1;
+            //            Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Zhuanpandowntime", zhuanpandowntime.ToString("F1"));
+            //        }
+            //        if (M10000[102] && DangbanFirstProduct == GetBanci())
+            //        {
+            //            lingmindudowntime += 0.1;
+            //            Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Lingmindudowntime", lingmindudowntime.ToString("F1"));
+            //        }
+            //        if (M10000[103] && DangbanFirstProduct == GetBanci())
+            //        {
+            //            tiemojidowntime += 0.1;
+            //            Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Tiemojidowntime", tiemojidowntime.ToString("F1"));
+            //        }
+            //        if (M10000[107] && DangbanFirstProduct == GetBanci())
+            //        {
+            //            waitfortake += 0.1;
+            //            Inifile.INIWriteValue(iniTimelyRainPath, "TimelyRain", "Waitfortake", waitfortake.ToString("F1"));
+            //        }
+
+            //        TestCount_2.Text = HD200[6].ToString();
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "TestCount_2", TestCount_2.Text);
+            //        PassCount_2.Text = HD200[3].ToString();
+            //        if (HD200[6] == 0)
+            //        {
+            //            Yield_2.Text = "0";
+            //        }
+            //        else
+            //        {
+            //            Yield_2.Text = (HD200[3] / HD200[6] * 100).ToString("F1");
+            //        }
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "Yield_2", Yield_2.Text);
+            //        Downtime.Text = downtime.ToString("F1");
+            //        Zhuanpandowntime.Text = zhuanpandowntime.ToString("F1");
+            //        Lingmindudowntime.Text = lingmindudowntime.ToString("F1");
+            //        Tiemojidowntime.Text = tiemojidowntime.ToString("F1");
+
+            //        Waitfortake.Text = waitfortake.ToString("F1");
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "Downtime", downtime.ToString("F1"));
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "Zhuanpandowntime", zhuanpandowntime.ToString("F1"));
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "Lingmindudowntime", lingmindudowntime.ToString("F1"));
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "Tiemojidowntime", tiemojidowntime.ToString("F1"));
+
+            //        Inifile.INIWriteValue(iniFClient, "DataList", "Waitfortake", waitfortake.ToString("F1"));
+
+                   
+            //    }
+            //    #endregion
+             
+            //}
 
         }
-        private void WriteMachineData()
-        {
-            string excelpath = @"D:\D4XMachineData.xlsx";
+        //private void WriteMachineData()
+        //{
+        //    string excelpath = @"D:\D4XMachineData.xlsx";
 
-            try
-            {
-                FileInfo fileInfo = new FileInfo(excelpath);
-                if (!File.Exists(excelpath))
-                {
-                    using (ExcelPackage package = new ExcelPackage(fileInfo))
-                    {
-                        ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("MachineData");
-                        worksheet.Cells[1, 1].Value = "更新时间";
-                        worksheet.Cells[1, 2].Value = "上料机故障时间";
-                        worksheet.Cells[1, 3].Value = "转盘故障时间";
-                        worksheet.Cells[1, 4].Value = "灵敏度故障时间";
-                        worksheet.Cells[1, 5].Value = "贴膜机故障时间";
-                        worksheet.Cells[1, 6].Value = "等待上料转盘时间";
-                        worksheet.Cells[1, 7].Value = "等待上灵敏度时间";
-                        worksheet.Cells[1, 8].Value = "等待下贴膜机时间";
-                        worksheet.Cells[1, 9].Value = "上料/收盘等待时间";
-                        worksheet.Cells[1, 10].Value = "上料机投入数量";
-                        worksheet.Cells[1, 11].Value = "上料机产出数量";
-                        worksheet.Cells[1, 12].Value = "总测试数量";
-                        worksheet.Cells[1, 13].Value = "总PASS数量";
-                        worksheet.Cells[1, 14].Value = "总直通率";
-                        worksheet.Cells[1, 15].Value = "转盘测试数量";
-                        worksheet.Cells[1, 16].Value = "转盘PASS数量";
-                        worksheet.Cells[1, 17].Value = "转盘直通率";
-                        worksheet.Cells[1, 18].Value = "灵敏度测试数量";
-                        worksheet.Cells[1, 19].Value = "灵敏度PASS数量";
-                        worksheet.Cells[1, 20].Value = "灵敏度直通率";
-                        worksheet.Cells[1, 21].Value = "上料机报警数量";
-                        worksheet.Cells[1, 22].Value = "达成率";
-                        worksheet.Cells[1, 23].Value = "妥善率";
-                        worksheet.Cells[1, 24].Value = "上料机妥善率";
-                        worksheet.Cells[1, 25].Value = "转盘治具妥善率";
-                        worksheet.Cells[1, 26].Value = "灵敏度治具妥善率";
-                        worksheet.Cells[1, 27].Value = "贴膜机妥善率";
-                        package.Save();
-                    }
-                }
+        //    try
+        //    {
+        //        FileInfo fileInfo = new FileInfo(excelpath);
+        //        if (!File.Exists(excelpath))
+        //        {
+        //            using (ExcelPackage package = new ExcelPackage(fileInfo))
+        //            {
+        //                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("MachineData");
+        //                worksheet.Cells[1, 1].Value = "更新时间";
+        //                worksheet.Cells[1, 2].Value = "上料机故障时间";
+        //                worksheet.Cells[1, 3].Value = "转盘故障时间";
+        //                worksheet.Cells[1, 4].Value = "灵敏度故障时间";
+        //                worksheet.Cells[1, 5].Value = "贴膜机故障时间";
+        //                worksheet.Cells[1, 6].Value = "等待上料转盘时间";
+        //                worksheet.Cells[1, 7].Value = "等待上灵敏度时间";
+        //                worksheet.Cells[1, 8].Value = "等待下贴膜机时间";
+        //                worksheet.Cells[1, 9].Value = "上料/收盘等待时间";
+        //                worksheet.Cells[1, 10].Value = "上料机投入数量";
+        //                worksheet.Cells[1, 11].Value = "上料机产出数量";
+        //                worksheet.Cells[1, 12].Value = "总测试数量";
+        //                worksheet.Cells[1, 13].Value = "总PASS数量";
+        //                worksheet.Cells[1, 14].Value = "总直通率";
+        //                worksheet.Cells[1, 15].Value = "转盘测试数量";
+        //                worksheet.Cells[1, 16].Value = "转盘PASS数量";
+        //                worksheet.Cells[1, 17].Value = "转盘直通率";
+        //                worksheet.Cells[1, 18].Value = "灵敏度测试数量";
+        //                worksheet.Cells[1, 19].Value = "灵敏度PASS数量";
+        //                worksheet.Cells[1, 20].Value = "灵敏度直通率";
+        //                worksheet.Cells[1, 21].Value = "上料机报警数量";
+        //                worksheet.Cells[1, 22].Value = "达成率";
+        //                worksheet.Cells[1, 23].Value = "妥善率";
+        //                worksheet.Cells[1, 24].Value = "上料机妥善率";
+        //                worksheet.Cells[1, 25].Value = "转盘治具妥善率";
+        //                worksheet.Cells[1, 26].Value = "灵敏度治具妥善率";
+        //                worksheet.Cells[1, 27].Value = "贴膜机妥善率";
+        //                package.Save();
+        //            }
+        //        }
 
 
-                using (ExcelPackage package = new ExcelPackage(fileInfo))
-                {
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
-                    int newrow = worksheet.Dimension.End.Row + 1;
-                    worksheet.Cells[newrow, 1].Value = System.DateTime.Now.ToString();
-                    worksheet.Cells[newrow, 2].Value = Downtime.Text;
-                    worksheet.Cells[newrow, 3].Value = Zhuanpandowntime.Text;
-                    worksheet.Cells[newrow, 4].Value = Lingmindudowntime.Text;
-                    worksheet.Cells[newrow, 5].Value = Tiemojidowntime.Text;
-                    //worksheet.Cells[newrow, 6].Value = Waitzhuanpanforinput.Text;
-                    //worksheet.Cells[newrow, 7].Value = Waitlingminduforinput.Text;
-                    //worksheet.Cells[newrow, 8].Value = WaitTiemojiforinput.Text;
-                    worksheet.Cells[newrow, 9].Value = Waitfortake.Text;
-                    //worksheet.Cells[newrow, 10].Value = input.Text;
-                    //worksheet.Cells[newrow, 11].Value = output.Text;
-                    //worksheet.Cells[newrow, 12].Value = TestCount_Total.Text;
-                    //worksheet.Cells[newrow, 13].Value = PassCount_Total.Text;
-                    //worksheet.Cells[newrow, 14].Value = Yield_Total.Text;
-                    //worksheet.Cells[newrow, 15].Value = TestCount_1.Text;
-                    //worksheet.Cells[newrow, 16].Value = PassCount_1.Text;
-                    //worksheet.Cells[newrow, 17].Value = Yield_1.Text;
-                    //worksheet.Cells[newrow, 18].Value = TestCount_2.Text;
-                    //worksheet.Cells[newrow, 19].Value = PassCount_2.Text;
-                    //worksheet.Cells[newrow, 20].Value = Yield_2.Text;
-                    //worksheet.Cells[newrow, 21].Value = AlarmCount.Text;
-                    //worksheet.Cells[newrow, 22].Value = AchievingRate.Text;
-                    //worksheet.Cells[newrow, 23].Value = ProperRate.Text;
-                    //worksheet.Cells[newrow, 24].Value = ProperRate_AutoMation.Text;
-                    //worksheet.Cells[newrow, 25].Value = ProperRate_Zhuanpan.Text;
-                    //worksheet.Cells[newrow, 26].Value = ProperRate_Lingmindu.Text;
-                    //worksheet.Cells[newrow, 27].Value = ProperRate_Tiemoji.Text;
-                    package.Save();
-                }
-                AddMessage("保存机台生产数据完成");
-            }
-            catch (Exception ex)
-            {
-                AddMessage(ex.Message);
-            }
-        }
+        //        using (ExcelPackage package = new ExcelPackage(fileInfo))
+        //        {
+        //            ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+        //            int newrow = worksheet.Dimension.End.Row + 1;
+        //            worksheet.Cells[newrow, 1].Value = System.DateTime.Now.ToString();
+        //            worksheet.Cells[newrow, 2].Value = Downtime.Text;
+        //            worksheet.Cells[newrow, 3].Value = Zhuanpandowntime.Text;
+        //            worksheet.Cells[newrow, 4].Value = Lingmindudowntime.Text;
+        //            worksheet.Cells[newrow, 5].Value = Tiemojidowntime.Text;
+        //            //worksheet.Cells[newrow, 6].Value = Waitzhuanpanforinput.Text;
+        //            //worksheet.Cells[newrow, 7].Value = Waitlingminduforinput.Text;
+        //            //worksheet.Cells[newrow, 8].Value = WaitTiemojiforinput.Text;
+        //            worksheet.Cells[newrow, 9].Value = Waitfortake.Text;
+        //            //worksheet.Cells[newrow, 10].Value = input.Text;
+        //            //worksheet.Cells[newrow, 11].Value = output.Text;
+        //            //worksheet.Cells[newrow, 12].Value = TestCount_Total.Text;
+        //            //worksheet.Cells[newrow, 13].Value = PassCount_Total.Text;
+        //            //worksheet.Cells[newrow, 14].Value = Yield_Total.Text;
+        //            //worksheet.Cells[newrow, 15].Value = TestCount_1.Text;
+        //            //worksheet.Cells[newrow, 16].Value = PassCount_1.Text;
+        //            //worksheet.Cells[newrow, 17].Value = Yield_1.Text;
+        //            //worksheet.Cells[newrow, 18].Value = TestCount_2.Text;
+        //            //worksheet.Cells[newrow, 19].Value = PassCount_2.Text;
+        //            //worksheet.Cells[newrow, 20].Value = Yield_2.Text;
+        //            //worksheet.Cells[newrow, 21].Value = AlarmCount.Text;
+        //            //worksheet.Cells[newrow, 22].Value = AchievingRate.Text;
+        //            //worksheet.Cells[newrow, 23].Value = ProperRate.Text;
+        //            //worksheet.Cells[newrow, 24].Value = ProperRate_AutoMation.Text;
+        //            //worksheet.Cells[newrow, 25].Value = ProperRate_Zhuanpan.Text;
+        //            //worksheet.Cells[newrow, 26].Value = ProperRate_Lingmindu.Text;
+        //            //worksheet.Cells[newrow, 27].Value = ProperRate_Tiemoji.Text;
+        //            package.Save();
+        //        }
+        //        AddMessage("保存机台生产数据完成");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        AddMessage(ex.Message);
+        //    }
+        //}
         //private void WriteBarcodeData()
         //{
         //    string excelpath1 = @"D:\D4XBarcodeData.xlsx";
@@ -742,8 +676,8 @@ namespace D4XUI
             //var a = CheckSampleFromDt();
             if (!SampleTestAbort && !IsInSampleMode && IsSample && plcstate)
             {
-                Xinjie.SetM(10110, true);
-                Xinjie.SetM(10112, false);
+                Xinjie.SetM(11110, true);
+                Xinjie.SetM(11112, false);
                 SampleTestFinished = false;
                 SampleBarcode.Clear();
                 NowSam = DateTime.Now;
@@ -764,15 +698,17 @@ namespace D4XUI
         public void PLCWork()
         {
             string COM = Inifile.INIGetStringValue(iniParameterPath, "PLC", "COM", "COM19");
+            Random rd = new Random();
             while (true)
             {
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(100);
                 plcstate = Xinjie.ReadSM(0);
                 if (plcstate)
                 {
-                    M10000 = Xinjie.ReadMultiMCoil(10000);//读160个M
+                    M10000 = Xinjie.ReadMultiMCoil(11000);//读160个M
                     HD200 = Xinjie.readMultiHD(200);//读30个双字（32位）
                     D1200 = Xinjie.ReadW(1200);//读1个字（16位）
+                    Xinjie.WriteW(1201, rd.Next(0, 99).ToString());
                 }
                 else
                 {
@@ -811,37 +747,16 @@ namespace D4XUI
                 string rs = await udp1.ReceiveAsync();
 
                 #region 从转盘接收条码
-
-                //string rs = await udp1.ReceiveAsync();
                 if (rs != "error")
                 {
-                    //string tiaomafenpeicishu = rs;
-                    //if (tiaomafenpeicishu.Contains("\r"))
-                    //{
-                    //    tiaomafenpeicishu.Replace("\r","");
-                    //}
-                    //if (tiaomafenpeicishu.Contains("\n"))
-                    //{
-                    //    tiaomafenpeicishu.Replace("\n", "");
-                    //}
                     RunLog("从转盘接收 " + rs);
                     AddMessage("从转盘接收 " + rs);
 
-                    Xinjie.SetM(10148, true);
+                    Xinjie.SetM(11148, true);
 
                     string sends = "SNOK";
                     await udp1.SendAsync(sends);
                     AddMessage("向转盘发送 " + sends);
-                    //if (M10000[142])
-                    //{
-                    //    ZhuanpanBarcode1.Text = "null";
-                    //    Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
-                    //}
-                    //if (M10000[143])
-                    //{
-                    //    ZhuanpanBarcode2.Text = "null";
-                    //    Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
-                    //}
                     try
                     {
                         //SN1:G5Y9301RDD0K9037V-GF,P;SN2:G5Y9301RDCNK9037A-GF,P
@@ -938,64 +853,7 @@ namespace D4XUI
 
 
                 }
-                #endregion
-                #region 从灵敏度接收结果
-
-                //string rs1 = await udp2.ReceiveAsync();
-                //if (rs1 != "error")
-                //{
-                //    AddMessage("从灵敏度接收 " + rs1);
-                //    RunLog("从灵敏度接收 " + rs1);
-                //    try
-                //    {
-                //        string[] s2 = rs1.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-                //        string[] s2_1 = s2[0].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-                //        if (s2_1[0] == "SN1")
-                //        {
-                //            string[] s2_1_1 = s2_1[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                //            LingminduJieGuo1.Text = s2_1_1[1];
-                //            Inifile.INIWriteValue(iniParameterPath, "JieGuo", "LingminduJieGuo1", LingminduJieGuo1.Text);
-                //            if (s2_1_1[1] == "OK")
-                //                Xinjie.SetM(10144, true);
-                //            else
-                //                Xinjie.SetM(10144, false);
-                //            if (s2_1_1[1] == "NG")
-                //                Xinjie.SetM(10145, true);
-                //            else
-                //                Xinjie.SetM(10145, false);
-
-                //        }
-                //        string[] s2_2 = s2[1].Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
-                //        if (s2_2[0] == "SN2")
-                //        {
-                //            string[] s2_2_1 = s2_2[1].Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                //            LingminduJieGuo2.Text = s2_2_1[1];
-                //            Inifile.INIWriteValue(iniParameterPath, "JieGuo", "LingminduJieGuo2", LingminduJieGuo2.Text);
-                //            string[] s2_2_1_1 = s2_2_1[1].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-
-                //            if (s2_2_1_1[0] == "OK")
-                //                Xinjie.SetM(10146, true);
-                //            else
-                //                Xinjie.SetM(10146, false);
-                //            if (s2_2_1_1[0] == "NG")
-                //                Xinjie.SetM(10147, true);
-                //            else
-                //                Xinjie.SetM(10147, false);
-
-                //        }
-
-                //    }
-
-                //    catch (Exception ex)
-                //    {
-
-                //        AddMessage(ex.Message);
-                //    }
-
-
-
-                //}
-                #endregion
+                #endregion        
                 #region 读取PLC信号
 
                 if (plcstate)
@@ -1006,37 +864,18 @@ namespace D4XUI
                         first = false;
                         M10140 = M10000[140];//条码移动到吸爪
                         M10141 = M10000[141];//条码移动到灵敏度
-                        M10142 = M10000[142];//左穴空,清空左穴条码
-                        M10143 = M10000[143];//右穴空,清空右穴条码
-                        M10150 = M10000[150];
-                        M10151 = M10000[151];
-                        M10152 = M10000[152];
-                        M10153 = M10000[153];
-                        M10154 = M10000[154];
+                        M10150 = M10000[150];//清空灵敏度条码
+                        M10151 = M10000[151];//灵敏度1PASS
+                        M10152 = M10000[152];//灵敏度1NG
+                        M10153 = M10000[153];//灵敏度2PASS
+                        M10154 = M10000[154];//灵敏度2NG
                     }
-                    IsInSampleMode = M10000[110];
-                    SampleTestAbort = M10000[111];
-                    SampleTestFinished = M10000[112];
-                    SampleTestStart = M10000[113];
-                    if (IsInSampleMode && SampleTestAbort)
-                    {
-                        AddMessage("样本测试中断");
-                        Xinjie.SetM(10110, false);
-                        IsInSampleMode = false;
-                        SampleBarcode.Clear();
-                    }
+
                     if (M10140 != M10000[140])
                     {
                         M10140 = M10000[140];
                         if (M10140)
                         {
-
-                            //if (M10000[142])
-                            //    ZhuanpanBarcode1.Text = "null";
-                            //Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
-                            //if (M10000[143])
-                            //    ZhuanpanBarcode2.Text = "null";
-                            //Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
                             AddMessage("条码从撕膜到吸爪 " + ZhuanpanBarcode1.Text + "," + ZhuanpanBarcode2.Text);
                             RunLog("条码从撕膜到吸爪 " + ZhuanpanBarcode1.Text + "," + ZhuanpanBarcode2.Text);
                             SimoBarcode1.Text = ZhuanpanBarcode1.Text;
@@ -1051,10 +890,6 @@ namespace D4XUI
                             ZhuanpanBarcode2.Text = "null";
                             ZhuanpanBarcode2.Background = Brushes.White;
                             Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
-                            //SimoJieGuo1 = ZhuanpanJieGuo1;
-                            //SimoJieGuo2 = ZhuanpanJieGuo2;
-                            //Xinjie.SetM(10142, false);
-                            //Xinjie.SetM(10143, false);
                         }
                     }
                     if (M10141 != M10000[141])
@@ -1076,8 +911,6 @@ namespace D4XUI
                             SimoBarcode2.Text = "null";
                             SimoBarcode2.Background = Brushes.White;
                             Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode2", SimoBarcode2.Text);
-                            //S_LingminduJieGuo1 = SimoJieGuo1;
-                            //S_LingminduJieGuo2 = SimoJieGuo2;
                             string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
                             await udp2.SendAsync(sends);
                             AddMessage("向灵敏度发送 " + sends);
