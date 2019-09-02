@@ -24,6 +24,8 @@ using System.Diagnostics;
 using BingLibrary.hjb;
 using 臻鼎科技OraDB;
 using System.Data;
+using MySql.Data.MySqlClient;
+using System.Net;
 
 namespace D4XUI
 {
@@ -65,18 +67,33 @@ namespace D4XUI
 
             MsgTextBox.Text = MessageStr;
             PLCStatusEllipse.Fill = plcstate ? Brushes.Green : Brushes.Red;
-            AlarmGrid.Visibility = Visibility.Collapsed;
 
 
             if (M10000 != null && plcstate)
             {
                 for (int i = 0; i < AlarmList.Count; i++)
                 {
-                    if (M10000[i])
+                    if (M10000[i] != AlarmList[i].State)
                     {
-                        AlarmGrid.Visibility = Visibility.Visible;
-                        //AlarmTextBlock.Text = AlarmList[i];
-                        break;
+                        AlarmList[i].State = M10000[i];
+                        if (AlarmList[i].State)
+                        {
+                            AlarmList[i].Start = DateTime.Now;
+                            AddMessage(AlarmList[i].Code + AlarmList[i].Content + "发生");
+                            string _ip = GetIp();
+                            string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
+                            string _faulttime = "0";
+                            BigDataUpdate(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime, "ON");
+                        }
+                        else
+                        {
+                            AlarmList[i].End = DateTime.Now;
+                            AddMessage(AlarmList[i].Code + AlarmList[i].Content + "解除");
+                            string _ip = GetIp();
+                            string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
+                            string _faulttime = (AlarmList[i].End - AlarmList[i].Start).TotalMinutes.ToString("F0");
+                            BigDataUpdate(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime, "OFF");
+                        }
                     }
                 }
             }
@@ -234,6 +251,7 @@ namespace D4XUI
                             ad.Content = worksheet.Cells["B" + i.ToString()].Value == null ? "Null" : worksheet.Cells["B" + i.ToString()].Value.ToString();
                             ad.Start = DateTime.Now;
                             ad.End = DateTime.Now;
+                            ad.State = false;
                             AlarmList.Add(ad);
                         }
                     }
@@ -400,8 +418,6 @@ namespace D4XUI
             //    AddMessage("开始样本测试");
             //}
         }
-
-        bool M10148 = false, M10149 = false;
 
         double D1200;
 
@@ -868,6 +884,70 @@ namespace D4XUI
             
         }
         #endregion
+        #region 大数据上传
+        /// <summary>
+        /// 大数据上传
+        /// </summary>
+        /// <param name="COMPUTERIP">计算机IP</param>
+        /// <param name="MACID">治具编号</param>
+        /// <param name="LINEID">线体</param>
+        /// <param name="PARTNUM">测试料号</param>
+        /// <param name="CLASS">测试班别</param>
+        /// <param name="FAULTID">故障名称</param>
+        /// <param name="FAULTSTARTTIME">故障开始时间</param>
+        /// <param name="FAULTTIME">故障时长(min)</param>
+        /// <param name="FL01">预留字段/治具故障报警/OFF</param>
+        /// <returns></returns>
+        private async void BigDataUpdate(string COMPUTERIP,string MACID,string LINEID,string PARTNUM,string CLASS,string FAULTID,string FAULTSTARTTIME,string FAULTTIME,string FL01)
+        {
+            int result = await Task.Run<int>(() =>
+            {
+                MySqlConnection conn = null;
+                try
+                {
+                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata";
+                    conn = new MySqlConnection(StrMySQL);
+                    conn.Open();
+
+                    string stm = "insert into TED_FAULT_DATA (WORKSTATION,COMPUTERIP,MACID,LINEID,PARTNUM,TDATE,TTIME,CLASS,FAULTID,FAULTSTARTTIME,FAULTTIME,REPAIRRESULT,REPAIRER,FL01) VALUES ('FCT','"
+                        + COMPUTERIP + "','" + MACID + "','" + LINEID + "','" + PARTNUM + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + DateTime.Now.ToString("HHmmss") + "','"
+                        + CLASS + "','" + FAULTID + "','" + FAULTSTARTTIME + "','" + FAULTTIME + "','NA','NA','" + FL01 + "')";
+                    MySqlCommand cmd = new MySqlCommand(stm, conn);
+                    return cmd.ExecuteNonQuery();
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return -999;
+                    
+                }
+                finally
+                {
+                    if (conn != null)
+                    {
+                        conn.Close();
+                    }
+                }
+            });
+            AddMessage("上传报警" + result.ToString());
+        }
+        string GetIp()
+        {
+            string ipstring = "127.0.0.1";
+            string hostName = Dns.GetHostName();
+            System.Net.IPAddress[] addressList = Dns.GetHostAddresses(hostName);//会返回所有地址，包括IPv4和IPv6 
+            foreach (var item in addressList)
+            {
+                ipstring = item.ToString();
+                string[] ss = ipstring.Split(new string[] { "." }, StringSplitOptions.None);
+                if (ss.Length == 4 && ss[0] == "10")
+                {
+                    return ipstring;
+                }
+            }
+            return "127.0.0.1";
+        }
+        #endregion
         private void SaveResult(string bar,string rst,string index)
         {
             try
@@ -938,6 +1018,7 @@ namespace D4XUI
         public string Content { set; get; }
         public DateTime Start { set; get; }
         public DateTime End { set; get; }
+        public bool State { set; get; }
     }
 }
 
