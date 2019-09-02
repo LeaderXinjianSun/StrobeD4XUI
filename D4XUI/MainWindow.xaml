@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 2019083001" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="D4XUI 2019090201" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -51,6 +51,7 @@
         <Grid Grid.Column="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="100"></RowDefinition>
             </Grid.RowDefinitions>
@@ -194,13 +195,31 @@
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="2">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="治具编号" Width="60"></TextBlock>
+                        <TextBox IsReadOnly="True" Name="治具编号" Width="100"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="线体" Width="60"></TextBlock>
+                        <TextBox IsReadOnly="True" Name="线体" Width="100"></TextBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="测试料号" Width="60"></TextBlock>
+                        <TextBox IsReadOnly="True" Name="测试料号" Width="100"></TextBox>
+                    </StackPanel>
+                    <Button Name="SaveButton" Content="Edit" Width="60" Height="30" HorizontalAlignment="Right" Margin="10" Click="SaveButton_Click"></Button>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="3">
                 <Canvas>
                     <Button Name="SampleButton" Canvas.Left="10" Canvas.Top="10" Height="30" Width="80" Content="样本" Click="SampleButton_Click"></Button>
                     <StackPanel Canvas.Left="10" Canvas.Top="50" Orientation="Vertical">
                         <TextBlock Text="上次测样本时刻:"></TextBlock>
                         <TextBlock Name="LastSampleTime"></TextBlock>
                     </StackPanel>
-                    <Button Name="FuncButton" Canvas.Left="100" Canvas.Top="10" Height="30" Width="80" Content="功能" Click="FuncButton_Click"></Button>
+                    <!--<Button Name="FuncButton" Canvas.Left="100" Canvas.Top="10" Height="30" Width="80" Content="功能" Click="FuncButton_Click"></Button>-->
+                    <Button Name="ManulSampleButton" Canvas.Left="100" Canvas.Top="10" Height="30" Width="80" Content="手动" Click="ManulSampleButton_Click"></Button>
                 </Canvas>
             </Grid>
         </Grid>
