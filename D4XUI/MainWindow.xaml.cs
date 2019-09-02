@@ -83,7 +83,7 @@ namespace D4XUI
                             string _ip = GetIp();
                             string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                             string _faulttime = "0";
-                            BigDataUpdate(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime, "ON");
+                            BigDataInsert(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime);
                         }
                         else
                         {
@@ -92,7 +92,7 @@ namespace D4XUI
                             string _ip = GetIp();
                             string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                             string _faulttime = (AlarmList[i].End - AlarmList[i].Start).TotalMinutes.ToString("F0");
-                            BigDataUpdate(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime, "OFF");
+                            BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);                            
                         }
                     }
                 }
@@ -898,7 +898,7 @@ namespace D4XUI
         /// <param name="FAULTTIME">故障时长(min)</param>
         /// <param name="FL01">预留字段/治具故障报警/OFF</param>
         /// <returns></returns>
-        private async void BigDataUpdate(string COMPUTERIP,string MACID,string LINEID,string PARTNUM,string CLASS,string FAULTID,string FAULTSTARTTIME,string FAULTTIME,string FL01)
+        private async void BigDataInsert(string COMPUTERIP,string MACID,string LINEID,string PARTNUM,string CLASS,string FAULTID,string FAULTSTARTTIME,string FAULTTIME)
         {
             int result = await Task.Run<int>(() =>
             {
@@ -911,7 +911,7 @@ namespace D4XUI
 
                     string stm = "insert into TED_FAULT_DATA (WORKSTATION,COMPUTERIP,MACID,LINEID,PARTNUM,TDATE,TTIME,CLASS,FAULTID,FAULTSTARTTIME,FAULTTIME,REPAIRRESULT,REPAIRER,FL01) VALUES ('FCT','"
                         + COMPUTERIP + "','" + MACID + "','" + LINEID + "','" + PARTNUM + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + DateTime.Now.ToString("HHmmss") + "','"
-                        + CLASS + "','" + FAULTID + "','" + FAULTSTARTTIME + "','" + FAULTTIME + "','NA','NA','" + FL01 + "')";
+                        + CLASS + "','" + FAULTID + "','" + FAULTSTARTTIME + "','" + FAULTTIME + "','NA','NA','ON')";
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
                     return cmd.ExecuteNonQuery();
                 }
@@ -930,6 +930,38 @@ namespace D4XUI
                 }
             });
             AddMessage("上传报警" + result.ToString());
+        }
+        private async void BigDataUpdate(string ip, string content,string starttime,string _class,string faulttime)
+        {
+            int result = await Task.Run<int>(() =>
+            {
+                MySqlConnection conn = null;
+                try
+                {
+                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata";
+                    conn = new MySqlConnection(StrMySQL);
+                    conn.Open();
+
+                    string stm = "update TED_FAULT_DATA SET CLASS = '" + _class + "',FAULTTIME = '" + faulttime + "',FL01 = 'OFF' WHERE COMPUTERIP = '" 
+                    + ip + "' AND FAULTID = '" + content + "' AND FAULTSTARTTIME = '" + starttime + "'";
+                    MySqlCommand cmd = new MySqlCommand(stm, conn);
+                    return cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return -999;
+
+                }
+                finally
+                {
+                    if (conn != null)
+                    {
+                        conn.Close();
+                    }
+                }
+            });
+            AddMessage("更新报警" + result.ToString());
         }
         string GetIp()
         {
