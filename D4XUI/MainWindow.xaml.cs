@@ -106,10 +106,10 @@ namespace D4XUI
                     if (M10000[120])
                     {
                         waitinputtick++;
-                        Waitfortake.Text = ((double)waitinputtick / 60).ToString("F1");
-                        Inifile.INIWriteValue(iniParameterPath, "DataList", "Waitfortake", waitinputtick.ToString());
                     }
                 }
+                Waitfortake.Text = ((double)waitinputtick / 60).ToString("F1");
+                Inifile.INIWriteValue(iniParameterPath, "DataList", "Waitfortake", waitinputtick.ToString());
             }
             #region 样本
             DateTime SamStartDatetime, SamDate, SamDateBigin;
@@ -966,20 +966,18 @@ namespace D4XUI
                         + COMPUTERIP + "','" + MACID + "','" + LINEID + "','" + PARTNUM + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + DateTime.Now.ToString("HHmmss") + "','"
                         + CLASS + "','" + FAULTID + "','" + FAULTSTARTTIME + "','" + FAULTTIME + "','NA','NA','ON')";
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
-                    return cmd.ExecuteNonQuery();
+                    int res = cmd.ExecuteNonQuery();
+                    conn.Close();
+                    return res;
                 }
                 catch(Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    return -999;
-                    
-                }
-                finally
-                {
                     if (conn != null)
                     {
                         conn.Close();
                     }
+                    return -999;                    
                 }
             });
             AddMessage("上传报警" + result.ToString());
@@ -998,20 +996,18 @@ namespace D4XUI
                     string stm = "update TED_FAULT_DATA SET CLASS = '" + _class + "',FAULTTIME = '" + faulttime + "',FL01 = 'OFF' WHERE COMPUTERIP = '" 
                     + ip + "' AND FAULTID = '" + content + "' AND FAULTSTARTTIME = '" + starttime + "'";
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
-                    return cmd.ExecuteNonQuery();
+                    int res = cmd.ExecuteNonQuery();
+                    conn.Close();
+                    return res;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    return -999;
-
-                }
-                finally
-                {
                     if (conn != null)
                     {
                         conn.Close();
                     }
+                    return -999;
                 }
             });
             AddMessage("更新报警" + result.ToString());
