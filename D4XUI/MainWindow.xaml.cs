@@ -46,7 +46,7 @@ namespace D4XUI
         
         string DangbanFirstProduct = "";
         string LastBanci = "";
-        Double UPH;
+        int waitinputtick = 0;int timetick = 0;
         DateTime LasSam, NowSam;
         public static SampleWindow SampleWindow = null;
         #endregion
@@ -64,7 +64,7 @@ namespace D4XUI
         }
         private void DispatcherTimerTickUpdateUi(Object sender, EventArgs e)
         {
-
+            timetick++;
             MsgTextBox.Text = MessageStr;
             PLCStatusEllipse.Fill = plcstate ? Brushes.Green : Brushes.Red;
 
@@ -96,8 +96,21 @@ namespace D4XUI
                         }
                     }
                 }
-            }
 
+            }
+            if (timetick > 10)
+            {
+                timetick = 0;
+                if (M10000 != null && plcstate)
+                {
+                    if (M10000[120])
+                    {
+                        waitinputtick++;
+                        Waitfortake.Text = ((double)waitinputtick / 60).ToString("F1");
+                        Inifile.INIWriteValue(iniParameterPath, "DataList", "Waitfortake", waitinputtick.ToString());
+                    }
+                }
+            }
             #region 样本
             DateTime SamStartDatetime, SamDate, SamDateBigin;
             if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
@@ -194,12 +207,15 @@ namespace D4XUI
                     Yield_2.Text = (HD200[3] / HD200[6] * 100).ToString("F1");
                 }
             }
-
+            
             #region 换班
             if (LastBanci != GetBanci())
             {
                 LastBanci = GetBanci();
                 Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
+                WriteMachineData();
+                waitinputtick = 0;
+                Inifile.INIWriteValue(iniParameterPath, "DataList", "Waitfortake", waitinputtick.ToString());
                 AddMessage(LastBanci + " 换班数据清零");
                 Xinjie.SetM(11099, true);//通知PLC换班，计数清空
             }
@@ -266,9 +282,48 @@ namespace D4XUI
                 AddMessage(ex.Message);
             }
         }
-        
 
-        
+        private void WriteMachineData()
+        {
+            string excelpath = @"D:\D4XMachineData.xlsx";
+
+            try
+            {
+                FileInfo fileInfo = new FileInfo(excelpath);
+                if (!File.Exists(excelpath))
+                {
+                    using (ExcelPackage package = new ExcelPackage(fileInfo))
+                    {
+                        ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("MachineData");
+                        worksheet.Cells[1, 1].Value = "更新时间";
+                        worksheet.Cells[1, 2].Value = "等待上料时间";
+                        worksheet.Cells[1, 3].Value = "测试数量";
+                        worksheet.Cells[1, 4].Value = "PASS数量";
+                        worksheet.Cells[1, 4].Value = "直通率";
+                        package.Save();
+                    }
+                }
+
+
+                using (ExcelPackage package = new ExcelPackage(fileInfo))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+                    int newrow = worksheet.Dimension.End.Row + 1;
+                    worksheet.Cells[newrow, 1].Value = System.DateTime.Now.ToString();
+                    worksheet.Cells[newrow, 2].Value = Waitfortake.Text;
+                    worksheet.Cells[newrow, 3].Value = TestCount_2.Text;
+                    worksheet.Cells[newrow, 4].Value = PassCount_2.Text;
+                    worksheet.Cells[newrow, 5].Value = Yield_2.Text;
+                    package.Save();
+                }
+                AddMessage("保存机台生产数据完成");
+            }
+            catch (Exception ex)
+            {
+                AddMessage(ex.Message);
+            }
+        }
+
         private void LoadParameter()
         {
             治具编号.Text = Inifile.INIGetStringValue(iniParameterPath, "System", "治具编号", "null");
@@ -285,21 +340,19 @@ namespace D4XUI
             LastSampleTime.Text = Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSample", "2019/1/1 00:00:00");
             try
             {
+                waitinputtick = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "DataList", "Waitfortake", "0"));
+            }
+            catch 
+            {
+                waitinputtick = 0;
+            }
+            try
+            {
                 LasSam = Convert.ToDateTime(LastSampleTime.Text);
             }
             catch
             {
                 LastSampleTime.Text = Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSample", "2019/1/1 00:00:00");
-            }
-            //LingminduJieGuo1.Text = Inifile.INIGetStringValue(iniParameterPath, "JieGuo", "LingminduJieGuo1", "null");
-            //LingminduJieGuo2.Text = Inifile.INIGetStringValue(iniParameterPath, "JieGuo", "LingminduJieGuo2", "null");
-            try
-            {
-                UPH = Double.Parse(Inifile.INIGetStringValue(iniParameterPath, "Summary", "UPH", "300"));
-            }
-            catch
-            {
-                UPH = 300;
             }
 
             string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";

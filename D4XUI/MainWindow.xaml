@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 2019090201" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="D4XUI 2019090301" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -65,13 +65,13 @@
                         <TextBlock Text="上料机生产时间" Width="100"></TextBlock>
                         <TextBlock Name="Downtime" Width="60"></TextBlock>
                         <TextBlock Text="min" Width="30"></TextBlock>
-                    </StackPanel>
+                    </StackPanel>-->
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="等待上料/收盘时间" Width="100"></TextBlock>
+                        <TextBlock Text="等待上料时间" Width="100"></TextBlock>
                         <TextBlock Name="Waitfortake" Width="60"></TextBlock>
                         <TextBlock Text="min" Width="30"></TextBlock>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
+                    <!--<StackPanel Orientation="Horizontal">
                         <TextBlock Text="转盘故障时间" Width="100"></TextBlock>
                         <TextBlock Name="Zhuanpandowntime" Width="60"></TextBlock>
                         <TextBlock Text="min" Width="30"></TextBlock>
