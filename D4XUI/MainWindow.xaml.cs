@@ -247,6 +247,7 @@ namespace D4XUI
             AddMessage("加载完成");
             dispatcherTimer.Start();
             UDPWork();
+            UDPWorkVPP();
             NowSam = DateTime.Now;
         }
         private void LoadAlarmNames()
@@ -524,11 +525,11 @@ namespace D4XUI
         }
         async void UDPWork()
         {
-            bool first = true;
-            Stopwatch sw = new Stopwatch();
+            
+            
             while (true)
             {
-                sw.Restart();
+                
                 string rs = await udp1.ReceiveAsync();
 
                 #region 从转盘接收条码
@@ -536,8 +537,11 @@ namespace D4XUI
                 {
                     RunLog("从转盘接收 " + rs);
                     AddMessage("从转盘接收 " + rs);
-
-                    Xinjie.SetM(11148, true);
+                    if (plcstate)
+                    {
+                        Xinjie.SetM(11148, true);
+                    }
+                    
 
                     string sends = "SNOK";
                     await udp1.SendAsync(sends);
@@ -639,155 +643,174 @@ namespace D4XUI
 
                 }
                 #endregion        
+               
+            }
+
+        }
+
+        async void UDPWorkVPP()
+        {
+            Stopwatch sw = new Stopwatch();
+            bool first = true;
+            while (true)
+            {
+                sw.Restart();
+                await Task.Delay(100);
                 #region 读取PLC信号
-
-                if (plcstate)
+                try
                 {
-                    if (first)
+                    if (plcstate)
                     {
-                        await Task.Delay(100);
-                        first = false;
-                        M10140 = M10000[140];//条码移动到吸爪
-                        M10141 = M10000[141];//条码移动到灵敏度
-                        M10142 = M10000[142];//向灵敏度补发条码
-                        M10150 = M10000[150];//清空灵敏度条码
-                        M10151 = M10000[151];//灵敏度1PASS
-                        M10152 = M10000[152];//灵敏度1NG
-                        M10153 = M10000[153];//灵敏度2PASS
-                        M10154 = M10000[154];//灵敏度2NG
-                    }
+                        if (first)
+                        {
+                            await Task.Delay(100);
+                            first = false;
+                            M10140 = M10000[140];//条码移动到吸爪
+                            M10141 = M10000[141];//条码移动到灵敏度
+                            M10142 = M10000[142];//向灵敏度补发条码
+                            M10150 = M10000[150];//清空灵敏度条码
+                            M10151 = M10000[151];//灵敏度1PASS
+                            M10152 = M10000[152];//灵敏度1NG
+                            M10153 = M10000[153];//灵敏度2PASS
+                            M10154 = M10000[154];//灵敏度2NG
+                        }
 
-                    if (M10140 != M10000[140])
-                    {
-                        M10140 = M10000[140];
-                        if (M10140)
+                        if (M10140 != M10000[140])
                         {
-                            AddMessage("条码从撕膜到吸爪 " + ZhuanpanBarcode1.Text + "," + ZhuanpanBarcode2.Text);
-                            RunLog("条码从撕膜到吸爪 " + ZhuanpanBarcode1.Text + "," + ZhuanpanBarcode2.Text);
-                            SimoBarcode1.Text = ZhuanpanBarcode1.Text;
-                            SimoBarcode1.Background = ZhuanpanBarcode1.Background;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode1", SimoBarcode1.Text);
-                            ZhuanpanBarcode1.Text = "null";
-                            ZhuanpanBarcode1.Background = Brushes.White;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
-                            SimoBarcode2.Text = ZhuanpanBarcode2.Text;
-                            SimoBarcode2.Background = ZhuanpanBarcode2.Background;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode2", SimoBarcode2.Text);
-                            ZhuanpanBarcode2.Text = "null";
-                            ZhuanpanBarcode2.Background = Brushes.White;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
+                            M10140 = M10000[140];
+                            if (M10140)
+                            {
+                                AddMessage("条码从撕膜到吸爪 " + ZhuanpanBarcode1.Text + "," + ZhuanpanBarcode2.Text);
+                                RunLog("条码从撕膜到吸爪 " + ZhuanpanBarcode1.Text + "," + ZhuanpanBarcode2.Text);
+                                SimoBarcode1.Text = ZhuanpanBarcode1.Text;
+                                SimoBarcode1.Background = ZhuanpanBarcode1.Background;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode1", SimoBarcode1.Text);
+                                ZhuanpanBarcode1.Text = "null";
+                                ZhuanpanBarcode1.Background = Brushes.White;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode1", ZhuanpanBarcode1.Text);
+                                SimoBarcode2.Text = ZhuanpanBarcode2.Text;
+                                SimoBarcode2.Background = ZhuanpanBarcode2.Background;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode2", SimoBarcode2.Text);
+                                ZhuanpanBarcode2.Text = "null";
+                                ZhuanpanBarcode2.Background = Brushes.White;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "ZhuanpanBarcode2", ZhuanpanBarcode2.Text);
+                            }
                         }
-                    }
-                    if (M10141 != M10000[141])
-                    {
-                        M10141 = M10000[141];
-                        if (M10141)
+                        if (M10141 != M10000[141])
                         {
-                            AddMessage("条码从吸爪到灵敏度" + SimoBarcode1.Text + "," + SimoBarcode2.Text);
-                            RunLog("条码从吸爪到灵敏度" + SimoBarcode1.Text + "," + SimoBarcode2.Text);
-                            LingminduBarcode1.Text = SimoBarcode1.Text;
-                            LingminduBarcode1.Background = SimoBarcode1.Background;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode1", LingminduBarcode1.Text);
-                            SimoBarcode1.Text = "null";
-                            SimoBarcode1.Background = Brushes.White;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode1", SimoBarcode1.Text);
-                            LingminduBarcode2.Text = SimoBarcode2.Text;
-                            LingminduBarcode2.Background = SimoBarcode2.Background;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
-                            SimoBarcode2.Text = "null";
-                            SimoBarcode2.Background = Brushes.White;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode2", SimoBarcode2.Text);
-                            string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
-                            await udp2.SendAsync(sends);
-                            AddMessage("向灵敏度发送 " + sends);
-                            RunLog("向灵敏度发送 " + sends);
+                            M10141 = M10000[141];
+                            if (M10141)
+                            {
+                                AddMessage("条码从吸爪到灵敏度" + SimoBarcode1.Text + "," + SimoBarcode2.Text);
+                                RunLog("条码从吸爪到灵敏度" + SimoBarcode1.Text + "," + SimoBarcode2.Text);
+                                LingminduBarcode1.Text = SimoBarcode1.Text;
+                                LingminduBarcode1.Background = SimoBarcode1.Background;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode1", LingminduBarcode1.Text);
+                                SimoBarcode1.Text = "null";
+                                SimoBarcode1.Background = Brushes.White;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode1", SimoBarcode1.Text);
+                                LingminduBarcode2.Text = SimoBarcode2.Text;
+                                LingminduBarcode2.Background = SimoBarcode2.Background;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
+                                SimoBarcode2.Text = "null";
+                                SimoBarcode2.Background = Brushes.White;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "SimoBarcode2", SimoBarcode2.Text);
+                                string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
+                                await udp2.SendAsync(sends);
+                                AddMessage("向灵敏度发送 " + sends);
+                                RunLog("向灵敏度发送 " + sends);
+                            }
                         }
-                    }
-                    if (M10142 != M10000[142])
-                    {
-                        M10142 = M10000[142];
-                        if (M10142)
+                        if (M10142 != M10000[142])
                         {
-                            string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
-                            await udp2.SendAsync(sends);
-                            AddMessage("向灵敏度补发 " + sends);
-                            RunLog("向灵敏度补发 " + sends);
+                            M10142 = M10000[142];
+                            if (M10142)
+                            {
+                                string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
+                                await udp2.SendAsync(sends);
+                                AddMessage("向灵敏度补发 " + sends);
+                                RunLog("向灵敏度补发 " + sends);
+                            }
                         }
-                    }
-                    if (M10150 != M10000[150])
-                    {
-                        M10150 = M10000[150];
-                        if (M10150)
+                        if (M10150 != M10000[150])
                         {
-                            AddMessage("灵敏度清空条码" + LingminduBarcode1.Text + "," + LingminduBarcode2.Text);
-                            RunLog("灵敏度清空条码" + LingminduBarcode1.Text + "," + LingminduBarcode2.Text);
-                            LingminduBarcode1.Text = "null";
-                            LingminduBarcode1.Background = Brushes.White;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode1", LingminduBarcode1.Text);
-                            LingminduBarcode2.Text = "null";
-                            LingminduBarcode2.Background = Brushes.White;
-                            Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
+                            M10150 = M10000[150];
+                            if (M10150)
+                            {
+                                AddMessage("灵敏度清空条码" + LingminduBarcode1.Text + "," + LingminduBarcode2.Text);
+                                RunLog("灵敏度清空条码" + LingminduBarcode1.Text + "," + LingminduBarcode2.Text);
+                                LingminduBarcode1.Text = "null";
+                                LingminduBarcode1.Background = Brushes.White;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode1", LingminduBarcode1.Text);
+                                LingminduBarcode2.Text = "null";
+                                LingminduBarcode2.Background = Brushes.White;
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
+                            }
                         }
-                    }
-                    if (M10151 != M10000[151])
-                    {
-                        M10151 = M10000[151];
-                        if (M10151)
+                        if (M10151 != M10000[151])
                         {
-                            LingminduJieGuo1.Background = Brushes.LightGreen;
-                            SaveResult(LingminduBarcode1.Text, "OK", "1");
+                            M10151 = M10000[151];
+                            if (M10151)
+                            {
+                                LingminduJieGuo1.Background = Brushes.LightGreen;
+                                SaveResult(LingminduBarcode1.Text, "OK", "1");
+                            }
+                            else
+                            {
+                                LingminduJieGuo1.Background = Brushes.Gray;
+                            }
                         }
-                        else
+                        if (M10152 != M10000[152])
                         {
-                            LingminduJieGuo1.Background = Brushes.Gray;
+                            M10152 = M10000[152];
+                            if (M10152)
+                            {
+                                LingminduJieGuo1.Background = Brushes.Red;
+                                SaveResult(LingminduBarcode1.Text, "NG", "1");
+                            }
+                            else
+                            {
+                                LingminduJieGuo1.Background = Brushes.Gray;
+                            }
                         }
-                    }
-                    if (M10152 != M10000[152])
-                    {
-                        M10152 = M10000[152];
-                        if (M10152)
+                        if (M10153 != M10000[153])
                         {
-                            LingminduJieGuo1.Background = Brushes.Red;
-                            SaveResult(LingminduBarcode1.Text, "NG", "1");
+                            M10153 = M10000[153];
+                            if (M10153)
+                            {
+                                LingminduJieGuo2.Background = Brushes.LightGreen;
+                                SaveResult(LingminduBarcode2.Text, "OK", "2");
+                            }
+                            else
+                            {
+                                LingminduJieGuo2.Background = Brushes.Gray;
+                            }
                         }
-                        else
+                        if (M10154 != M10000[154])
                         {
-                            LingminduJieGuo1.Background = Brushes.Gray;
-                        }
-                    }
-                    if (M10153 != M10000[153])
-                    {
-                        M10153 = M10000[153];
-                        if (M10153)
-                        {
-                            LingminduJieGuo2.Background = Brushes.LightGreen;
-                            SaveResult(LingminduBarcode2.Text, "OK", "2");
-                        }
-                        else
-                        {
-                            LingminduJieGuo2.Background = Brushes.Gray;
-                        }
-                    }
-                    if (M10154 != M10000[154])
-                    {
-                        M10154 = M10000[154];
-                        if (M10154)
-                        {
-                            LingminduJieGuo2.Background = Brushes.Red;
-                            SaveResult(LingminduBarcode2.Text, "NG", "2");
-                        }
-                        else
-                        {
-                            LingminduJieGuo2.Background = Brushes.Gray;
+                            M10154 = M10000[154];
+                            if (M10154)
+                            {
+                                LingminduJieGuo2.Background = Brushes.Red;
+                                SaveResult(LingminduBarcode2.Text, "NG", "2");
+                            }
+                            else
+                            {
+                                LingminduJieGuo2.Background = Brushes.Gray;
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+
+                    AddMessage(ex.Message);
+                }
+                
                 CycleText.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                #endregion
             }
-            #endregion
         }
-
-
         #endregion
         #region 数据库
         private void ConnectDBTest()
