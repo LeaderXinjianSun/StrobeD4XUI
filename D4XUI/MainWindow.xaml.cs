@@ -981,7 +981,7 @@ namespace D4XUI
                 MySqlConnection conn = null;
                 try
                 {
-                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata";
+                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata;pooling=false;CharSet=utf8;port=3306";
                     conn = new MySqlConnection(StrMySQL);
                     conn.Open();
 
@@ -991,6 +991,7 @@ namespace D4XUI
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
                     int res = cmd.ExecuteNonQuery();
                     conn.Close();
+                    conn.Dispose();
                     return res;
                 }
                 catch(Exception ex)
@@ -999,6 +1000,7 @@ namespace D4XUI
                     if (conn != null)
                     {
                         conn.Close();
+                        conn.Dispose();
                     }
                     return -999;                    
                 }
@@ -1012,7 +1014,7 @@ namespace D4XUI
                 MySqlConnection conn = null;
                 try
                 {
-                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata";
+                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata;pooling=false;CharSet=utf8;port=3306";
                     conn = new MySqlConnection(StrMySQL);
                     conn.Open();
 
@@ -1021,6 +1023,7 @@ namespace D4XUI
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
                     int res = cmd.ExecuteNonQuery();
                     conn.Close();
+                    conn.Dispose();
                     return res;
                 }
                 catch (Exception ex)
@@ -1029,6 +1032,7 @@ namespace D4XUI
                     if (conn != null)
                     {
                         conn.Close();
+                        conn.Dispose();
                     }
                     return -999;
                 }
