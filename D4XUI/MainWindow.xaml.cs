@@ -844,7 +844,75 @@ namespace D4XUI
         }
         #endregion
         #region 样本
-        bool IsSample, IsInSampleMode = false,SampleTestAbort = false,SampleTestStart = false,SampleTestFinished = false; int NGItemCount; string[,] NGItems = new string[10,2];
+        bool IsSample, IsInSampleMode = false,SampleTestAbort = false,SampleTestStart = false,SampleTestFinished = false;
+
+        private async void AlarmButton_Click(object sender, RoutedEventArgs e)
+        {
+            AlarmButton.IsEnabled = false;
+            await Task.Run(()=> {
+                try
+                {
+                    if (!Directory.Exists("C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd")))
+                    {
+                        Directory.CreateDirectory(@"C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd"));
+                    }
+                    string path = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Alarm.csv";
+                    Csvfile.savetocsv(path, new string[] { "Content", "Count", "Time(min)" });
+                    string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
+                    string _ip = GetIp();
+                    string _date = DateTime.Now.ToString("yyyyMMdd");
+                    foreach (var item in AlarmList)
+                    {
+                        MySqlConnection conn = null;
+                        string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata;pooling=false;CharSet=utf8;port=3306";
+                        conn = new MySqlConnection(StrMySQL);
+                        conn.Open();
+                        string stm;
+                        if (DateTime.Now.Hour > 8)
+                        {
+                            stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip + "' AND FAULTID = '" + item.Content +
+        "' AND TDATE = '" + _date + "' AND CLASS = '" + _class + "' AND FL01 = '" + "OFF'";
+                        }
+                        else
+                        {
+                            string _date1 = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+                            stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip + "' AND FAULTID = '" + item.Content +
+    "' AND TDATE IN ('" + _date + "','" + _date1 + "') AND CLASS = '" + _class + "'AND FL01 = '" + "OFF'";
+                        }
+                        MySqlCommand cmd = new MySqlCommand(stm, conn);
+                        MySqlDataReader rdr = cmd.ExecuteReader();
+                        int i = 0;
+                        float elapsed = 0;
+                        while (rdr.Read())
+                        {
+                            try
+                            {
+                                elapsed += float.Parse(rdr.GetString("FAULTTIME"));
+                            }
+                            catch { }
+                            i++;
+                        }
+                        if (i > 0)
+                        {
+                            Csvfile.savetocsv(path, new string[] { item.Content, i.ToString(), elapsed.ToString("F1") });
+                        }
+                    }
+                    Process process1 = new Process();
+                    process1.StartInfo.FileName = path;
+                    process1.StartInfo.Arguments = "";
+                    process1.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                    process1.Start();
+                }
+                catch (Exception ex)
+                {
+                    AddMessage(ex.Message);
+                }
+            });
+            AlarmButton.IsEnabled = true;
+
+        }
+
+        int NGItemCount; string[,] NGItems = new string[10,2];
         List<string> SampleBarcode = new List<string>();
         private void SampleButton_Click(object sender, RoutedEventArgs e)
         {

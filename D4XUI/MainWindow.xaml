@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 2019090701" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="D4XUI 2019091201" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -209,6 +209,7 @@
                         <TextBox IsReadOnly="True" Name="测试料号" Width="100"></TextBox>
                     </StackPanel>
                     <Button Name="SaveButton" Content="Edit" Width="60" Height="30" HorizontalAlignment="Right" Margin="10" Click="SaveButton_Click"></Button>
+                    <Button Name="AlarmButton" Content="Alarm" Width="60" Height="30" HorizontalAlignment="Right" Margin="10" Click="AlarmButton_Click"></Button>
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="3">
