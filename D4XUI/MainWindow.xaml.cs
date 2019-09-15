@@ -49,6 +49,7 @@ namespace D4XUI
         int timetick = 0;
         DateTime LasSam, NowSam;
         public static SampleWindow SampleWindow = null;
+        double Yield = 0, _efficiency = 0, _variation = 0;
         #endregion
         public MainWindow()
         {
@@ -110,7 +111,6 @@ namespace D4XUI
                 if (HD200 != null && plcstate)
                 {
                     #region 总直通率
-                    double Yield;
                     if (HD200[0] == 0)
                     {
                         Yield = 0;
@@ -119,7 +119,7 @@ namespace D4XUI
                     {
                         Yield = HD200[3] / HD200[0] * 100;
                     }
-                    Xinjie.WriteW(400, (Yield * 10).ToString("F0"));//总直通率
+                    //总直通率
                     #endregion
                     #region 工作效率
                     DateTime _StartTime;
@@ -140,12 +140,12 @@ namespace D4XUI
                     }
                     double _totalmin = (DateTime.Now - _StartTime).TotalMinutes;
                     double _workmin = _totalmin - HD200[10] - HD200[11] - HD200[12] - HD200[13];
-                    double _efficiency = HD200[3] / _workmin / HD200[4] * 60;
-                    Xinjie.WriteW(403, (_efficiency * 100).ToString("F0"));//工作效率
+                    _efficiency = HD200[3] / _workmin / HD200[4] * 60;
+                    //工作效率
                     #endregion
                     #region 影响比例
-                    double _variation = (HD200[10] + HD200[11] + HD200[12] + HD200[13]) / _totalmin;
-                    Xinjie.WriteW(404, (_variation * 1000).ToString("F0"));//影响比例
+                    _variation = (HD200[10] + HD200[11] + HD200[12] + HD200[13]) / 10 / _totalmin;
+                    //影响比例
                     #endregion
                 }
             }
@@ -540,6 +540,9 @@ namespace D4XUI
                     HD200 = Xinjie.readMultiHD(200);//读30个双字（32位）
                     D1200 = Xinjie.ReadW(1200);//读1个字（16位）
                     Xinjie.WriteW(1201, rd.Next(0, 99).ToString());
+                    Xinjie.WriteW(400, (Yield * 10).ToString("F0"));
+                    Xinjie.WriteW(403, (_efficiency * 100).ToString("F0"));
+                    Xinjie.WriteW(404, (_variation * 1000).ToString("F0"));
                 }
                 else
                 {
@@ -905,7 +908,16 @@ namespace D4XUI
                     Csvfile.savetocsv(path, new string[] { "Content", "Count", "Time(min)" });
                     string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                     string _ip = GetIp();
-                    string _date = DateTime.Now.ToString("yyyyMMdd");
+                    string _date;
+                    if (DateTime.Now.Hour < 8)
+                    {
+                        _date = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+                    }
+                    else
+                    {
+                        _date = DateTime.Now.ToString("yyyyMMdd");
+                    }
+                    
                     int alarmcount = 0; float alarmelapsed = 0;
                     foreach (var item in AlarmList)
                     {
@@ -914,17 +926,11 @@ namespace D4XUI
                         conn = new MySqlConnection(StrMySQL);
                         conn.Open();
                         string stm;
-                        if (DateTime.Now.Hour > 8)
-                        {
+
                             stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip + "' AND FAULTID = '" + item.Content +
         "' AND TDATE = '" + _date + "' AND CLASS = '" + _class + "' AND FL01 = '" + "OFF'";
-                        }
-                        else
-                        {
-                            string _date1 = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
-                            stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip + "' AND FAULTID = '" + item.Content +
-    "' AND TDATE IN ('" + _date + "','" + _date1 + "') AND CLASS = '" + _class + "'AND FL01 = '" + "OFF'";
-                        }
+                     
+
                         MySqlCommand cmd = new MySqlCommand(stm, conn);
                         MySqlDataReader rdr = cmd.ExecuteReader();
                         int i = 0;
@@ -1159,9 +1165,17 @@ namespace D4XUI
                     string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata;pooling=false;CharSet=utf8;port=3306";
                     conn = new MySqlConnection(StrMySQL);
                     conn.Open();
-
+                    string _TDate;
+                    if (DateTime.Now.Hour < 8)
+                    {
+                        _TDate = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+                    }
+                    else
+                    {
+                        _TDate = DateTime.Now.ToString("yyyyMMdd");
+                    }
                     string stm = "insert into TED_FAULT_DATA (WORKSTATION,COMPUTERIP,MACID,LINEID,PARTNUM,TDATE,TTIME,CLASS,FAULTID,FAULTSTARTTIME,FAULTTIME,REPAIRRESULT,REPAIRER,FL01) VALUES ('SLJ','"
-                        + COMPUTERIP + "','" + MACID + "','" + LINEID + "','" + PARTNUM + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + DateTime.Now.ToString("HHmmss") + "','"
+                        + COMPUTERIP + "','" + MACID + "','" + LINEID + "','" + PARTNUM + "','" + _TDate + "','" + DateTime.Now.ToString("HHmmss") + "','"
                         + CLASS + "','" + FAULTID + "','" + FAULTSTARTTIME + "','" + FAULTTIME + "','NA','NA','ON')";
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
                     int res = cmd.ExecuteNonQuery();
