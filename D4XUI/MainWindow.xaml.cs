@@ -318,10 +318,23 @@ namespace D4XUI
                     {
                         ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("MachineData");
                         worksheet.Cells[1, 1].Value = "更新时间";
-                        worksheet.Cells[1, 2].Value = "等待上料时间";
-                        worksheet.Cells[1, 3].Value = "测试数量";
-                        worksheet.Cells[1, 4].Value = "PASS数量";
-                        worksheet.Cells[1, 4].Value = "直通率";
+                        worksheet.Cells[1, 2].Value = "上料总数";
+                        worksheet.Cells[1, 3].Value = "下料总数";
+                        worksheet.Cells[1, 4].Value = "抛料数";
+                        worksheet.Cells[1, 5].Value = "良品数";
+                        worksheet.Cells[1, 6].Value = "UPH";
+                        worksheet.Cells[1, 7].Value = "掉料数";
+                        worksheet.Cells[1, 8].Value = "测试总数";
+                        worksheet.Cells[1, 9].Value = "待料时间";
+                        worksheet.Cells[1, 10].Value = "下空盘时间";
+                        worksheet.Cells[1, 11].Value = "换胶带时间";
+                        worksheet.Cells[1, 12].Value = "样本时间";
+                        worksheet.Cells[1, 13].Value = "转盘信号超时时间";
+                        worksheet.Cells[1, 14].Value = "灵敏度信号超时时间";
+                        worksheet.Cells[1, 15].Value = "贴膜机信号超时时间";
+                        worksheet.Cells[1, 16].Value = "转盘信号超时次数";
+                        worksheet.Cells[1, 17].Value = "灵敏度信号超时次数";
+                        worksheet.Cells[1, 18].Value = "贴膜机信号次数";
                         package.Save();
                     }
                 }
@@ -332,10 +345,29 @@ namespace D4XUI
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                     int newrow = worksheet.Dimension.End.Row + 1;
                     worksheet.Cells[newrow, 1].Value = System.DateTime.Now.ToString();
-                    //worksheet.Cells[newrow, 2].Value = Waitfortake.Text;
-                    //worksheet.Cells[newrow, 3].Value = TestCount_2.Text;
-                    //worksheet.Cells[newrow, 4].Value = PassCount_2.Text;
-                    //worksheet.Cells[newrow, 5].Value = Yield_2.Text;
+                    if (plcstate && HD200 != null)
+                    {
+                        worksheet.Cells[newrow, 2].Value = HD200[0];
+                        worksheet.Cells[newrow, 3].Value = HD200[1];
+                        worksheet.Cells[newrow, 4].Value = HD200[2];
+                        worksheet.Cells[newrow, 5].Value = HD200[3];
+                        worksheet.Cells[newrow, 6].Value = HD200[4];
+                        worksheet.Cells[newrow, 7].Value = HD200[5];
+                        worksheet.Cells[newrow, 8].Value = HD200[6];
+
+                        worksheet.Cells[newrow, 9].Value = HD200[10] / 10;
+                        worksheet.Cells[newrow, 10].Value = HD200[11] / 10;
+                        worksheet.Cells[newrow, 11].Value = HD200[12] / 10;
+                        worksheet.Cells[newrow, 12].Value = HD200[13] / 10;
+                        worksheet.Cells[newrow, 13].Value = HD200[14] / 10;
+                        worksheet.Cells[newrow, 14].Value = HD200[15] / 10;
+                        worksheet.Cells[newrow, 15].Value = HD200[16] / 10;
+
+                        worksheet.Cells[newrow, 16].Value = HD200[17];
+                        worksheet.Cells[newrow, 17].Value = HD200[18];
+                        worksheet.Cells[newrow, 18].Value = HD200[19];
+                    }
+
                     package.Save();
                 }
                 AddMessage("保存机台生产数据完成");
