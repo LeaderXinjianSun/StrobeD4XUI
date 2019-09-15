@@ -43,10 +43,10 @@ namespace D4XUI
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\D4X报警.xlsx";
         string alarmExcelPath1 = System.Environment.CurrentDirectory + "\\D4X条码.xlsx";
         List<AlarmData> AlarmList = new List<AlarmData>();
-        
+        string CurrentAlarmStr = "";
         string DangbanFirstProduct = "";
         string LastBanci = "";
-        int waitinputtick = 0;int timetick = 0;
+        int timetick = 0;
         DateTime LasSam, NowSam;
         public static SampleWindow SampleWindow = null;
         #endregion
@@ -55,7 +55,7 @@ namespace D4XUI
             InitializeComponent();
 
             dispatcherTimer.Tick += new EventHandler(DispatcherTimerTickUpdateUi);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);//6秒更新一次，即0.1分钟。
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);//0.1s
 
         }
         private void MsgTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -67,8 +67,7 @@ namespace D4XUI
             timetick++;
             MsgTextBox.Text = MessageStr;
             PLCStatusEllipse.Fill = plcstate ? Brushes.Green : Brushes.Red;
-
-
+            #region 大数据
             if (M10000 != null && plcstate)
             {
                 for (int i = 0; i < AlarmList.Count; i++)
@@ -78,12 +77,16 @@ namespace D4XUI
                         AlarmList[i].State = M10000[i];
                         if (AlarmList[i].State)
                         {
-                            AlarmList[i].Start = DateTime.Now;
-                            AddMessage(AlarmList[i].Code + AlarmList[i].Content + "发生");
-                            string _ip = GetIp();
-                            string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
-                            string _faulttime = "0";
-                            BigDataInsert(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime);
+                            if (CurrentAlarmStr != AlarmList[i].Content)
+                            {
+                                CurrentAlarmStr = AlarmList[i].Content;
+                                AlarmList[i].Start = DateTime.Now;
+                                AddMessage(AlarmList[i].Code + AlarmList[i].Content + "发生");
+                                string _ip = GetIp();
+                                string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
+                                string _faulttime = "0";
+                                BigDataInsert(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime);
+                            }
                         }
                         else
                         {
@@ -92,25 +95,61 @@ namespace D4XUI
                             string _ip = GetIp();
                             string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                             string _faulttime = (AlarmList[i].End - AlarmList[i].Start).TotalMinutes.ToString("F0");
-                            BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);                            
+                            BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);
                         }
                     }
                 }
 
             }
+            #endregion
+            #region 数据统计
             if (timetick > 10)
             {
                 timetick = 0;
-                if (M10000 != null && plcstate)
+
+                if (HD200 != null && plcstate)
                 {
-                    if (M10000[120])
+                    #region 总直通率
+                    double Yield;
+                    if (HD200[0] == 0)
                     {
-                        waitinputtick++;
+                        Yield = 0;
                     }
+                    else
+                    {
+                        Yield = HD200[3] / HD200[0] * 100;
+                    }
+                    Xinjie.WriteW(400, (Yield * 10).ToString("F0"));//总直通率
+                    #endregion
+                    #region 工作效率
+                    DateTime _StartTime;
+                    if (DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20)
+                    {
+                        _StartTime = Convert.ToDateTime("08:00:00");
+                    }
+                    else
+                    {
+                        if (DateTime.Now.Hour < 8)
+                        {
+                            _StartTime = Convert.ToDateTime("20:00:00").AddDays(-1);
+                        }
+                        else
+                        {
+                            _StartTime = Convert.ToDateTime("20:00:00");
+                        }
+                    }
+                    double _totalmin = (DateTime.Now - _StartTime).TotalMinutes;
+                    double _workmin = _totalmin - HD200[10] - HD200[11] - HD200[12] - HD200[13];
+                    double _efficiency = HD200[3] / _workmin / HD200[4] * 60;
+                    Xinjie.WriteW(403, (_efficiency * 100).ToString("F0"));//工作效率
+                    #endregion
+                    #region 影响比例
+                    double _variation = (HD200[10] + HD200[11] + HD200[12] + HD200[13]) / _totalmin;
+                    Xinjie.WriteW(404, (_variation * 1000).ToString("F0"));//影响比例
+                    #endregion
                 }
-                Waitfortake.Text = ((double)waitinputtick / 60).ToString("F1");
-                Inifile.INIWriteValue(iniParameterPath, "DataList", "Waitfortake", waitinputtick.ToString());
             }
+            #endregion
             #region 样本
             DateTime SamStartDatetime, SamDate, SamDateBigin;
             if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
@@ -193,35 +232,17 @@ namespace D4XUI
                 }
             }
             
-            #endregion
-            if (HD200 != null && plcstate)
-            {
-                TestCount_2.Text = HD200[6].ToString();
-                PassCount_2.Text = HD200[3].ToString();
-                if (HD200[6] == 0)
-                {
-                    Yield_2.Text = "0";
-                }
-                else
-                {
-                    Yield_2.Text = (HD200[3] / HD200[6] * 100).ToString("F1");
-                }
-            }
-            
+            #endregion           
             #region 换班
             if (LastBanci != GetBanci())
             {
                 LastBanci = GetBanci();
                 Inifile.INIWriteValue(iniParameterPath, "Summary", "LastBanci", LastBanci);
                 WriteMachineData();
-                waitinputtick = 0;
-                Inifile.INIWriteValue(iniParameterPath, "DataList", "Waitfortake", waitinputtick.ToString());
                 AddMessage(LastBanci + " 换班数据清零");
                 Xinjie.SetM(11099, true);//通知PLC换班，计数清空
             }
-            #endregion
-            
-
+            #endregion            
         }       
         public void AddMessage(string str)
         {
@@ -311,10 +332,10 @@ namespace D4XUI
                     ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
                     int newrow = worksheet.Dimension.End.Row + 1;
                     worksheet.Cells[newrow, 1].Value = System.DateTime.Now.ToString();
-                    worksheet.Cells[newrow, 2].Value = Waitfortake.Text;
-                    worksheet.Cells[newrow, 3].Value = TestCount_2.Text;
-                    worksheet.Cells[newrow, 4].Value = PassCount_2.Text;
-                    worksheet.Cells[newrow, 5].Value = Yield_2.Text;
+                    //worksheet.Cells[newrow, 2].Value = Waitfortake.Text;
+                    //worksheet.Cells[newrow, 3].Value = TestCount_2.Text;
+                    //worksheet.Cells[newrow, 4].Value = PassCount_2.Text;
+                    //worksheet.Cells[newrow, 5].Value = Yield_2.Text;
                     package.Save();
                 }
                 AddMessage("保存机台生产数据完成");
@@ -339,14 +360,6 @@ namespace D4XUI
             LingminduBarcode1.Text = Inifile.INIGetStringValue(iniParameterPath, "Barcode", "LingminduBarcode1", "null");
             LingminduBarcode2.Text = Inifile.INIGetStringValue(iniParameterPath, "Barcode", "LingminduBarcode2", "null");
             LastSampleTime.Text = Inifile.INIGetStringValue(iniParameterPath, "Sample", "LastSample", "2019/1/1 00:00:00");
-            try
-            {
-                waitinputtick = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "DataList", "Waitfortake", "0"));
-            }
-            catch 
-            {
-                waitinputtick = 0;
-            }
             try
             {
                 LasSam = Convert.ToDateTime(LastSampleTime.Text);
@@ -487,7 +500,7 @@ namespace D4XUI
             Random rd = new Random();
             while (true)
             {
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(50);
                 plcstate = Xinjie.ReadSM(0);
                 if (plcstate)
                 {
@@ -856,11 +869,12 @@ namespace D4XUI
                     {
                         Directory.CreateDirectory(@"C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd"));
                     }
-                    string path = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "Alarm.csv";
+                    string path = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "AlarmSimple.csv";
                     Csvfile.savetocsv(path, new string[] { "Content", "Count", "Time(min)" });
                     string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                     string _ip = GetIp();
                     string _date = DateTime.Now.ToString("yyyyMMdd");
+                    int alarmcount = 0; float alarmelapsed = 0;
                     foreach (var item in AlarmList)
                     {
                         MySqlConnection conn = null;
@@ -894,14 +908,75 @@ namespace D4XUI
                         }
                         if (i > 0)
                         {
+                            alarmcount += i;
+                            alarmelapsed += elapsed;
                             Csvfile.savetocsv(path, new string[] { item.Content, i.ToString(), elapsed.ToString("F1") });
                         }
+                        conn.Close();
+                        conn.Dispose();
+                    }
+                    if (plcstate)
+                    {
+                        Xinjie.WriteW(401, alarmcount.ToString());
+                        Xinjie.WriteW(402, (alarmelapsed * 10).ToString("F0"));
                     }
                     Process process1 = new Process();
                     process1.StartInfo.FileName = path;
                     process1.StartInfo.Arguments = "";
                     process1.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     process1.Start();
+                }
+                catch (Exception ex)
+                {
+                    AddMessage(ex.Message);
+                }
+            });
+            await Task.Run(() => {
+                try
+                {
+                    string path = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "AlarmTotal.csv";
+                    string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
+                    string _ip = GetIp();
+                    string _date = DateTime.Now.ToString("yyyyMMdd");
+                    MySqlConnection conn = null;
+                    string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata;pooling=false;CharSet=utf8;port=3306";
+                    conn = new MySqlConnection(StrMySQL);
+                    conn.Open();
+                    string stm;
+                    if (DateTime.Now.Hour > 8)
+                    {
+                        stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip +
+                                "' AND TDATE = '" + _date + "' AND CLASS = '" + _class + "' AND FL01 = '" + "OFF'";
+                    }
+                    else
+                    {
+                        string _date1 = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+                        stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip +
+                                "' AND TDATE IN ('" + _date + "','" + _date1 + "') AND CLASS = '" + _class + "'AND FL01 = '" + "OFF'";
+                    }
+                    DataSet ds = new DataSet();
+                    MySqlDataAdapter myadp = new MySqlDataAdapter(stm, conn); //适配器 
+                    myadp.Fill(ds, "table0");
+                    conn.Close();
+                    conn.Dispose();
+                    DataTable dt = ds.Tables["table0"];
+                    if (dt.Rows.Count > 0)
+                    {
+                        string strHead = DateTime.Now.ToString("yyyyMMddHHmmss") + "AlarmTotal";
+                        string strColumns = "";
+                        for (int i = 0; i < dt.Columns.Count; i++)
+                        {
+                            strColumns += dt.Columns[i].ColumnName + ",";
+                        }
+                        strColumns = strColumns.Substring(0, strColumns.Length - 1);
+                        Csvfile.dt2csv(dt, path, strHead, strColumns);
+
+                        Process process1 = new Process();
+                        process1.StartInfo.FileName = path;
+                        process1.StartInfo.Arguments = "";
+                        process1.StartInfo.WindowStyle = ProcessWindowStyle.Maximized;
+                        process1.Start();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1053,7 +1128,7 @@ namespace D4XUI
                     conn = new MySqlConnection(StrMySQL);
                     conn.Open();
 
-                    string stm = "insert into TED_FAULT_DATA (WORKSTATION,COMPUTERIP,MACID,LINEID,PARTNUM,TDATE,TTIME,CLASS,FAULTID,FAULTSTARTTIME,FAULTTIME,REPAIRRESULT,REPAIRER,FL01) VALUES ('FCT','"
+                    string stm = "insert into TED_FAULT_DATA (WORKSTATION,COMPUTERIP,MACID,LINEID,PARTNUM,TDATE,TTIME,CLASS,FAULTID,FAULTSTARTTIME,FAULTTIME,REPAIRRESULT,REPAIRER,FL01) VALUES ('SLJ','"
                         + COMPUTERIP + "','" + MACID + "','" + LINEID + "','" + PARTNUM + "','" + DateTime.Now.ToString("yyyyMMdd") + "','" + DateTime.Now.ToString("HHmmss") + "','"
                         + CLASS + "','" + FAULTID + "','" + FAULTSTARTTIME + "','" + FAULTTIME + "','NA','NA','ON')";
                     MySqlCommand cmd = new MySqlCommand(stm, conn);
