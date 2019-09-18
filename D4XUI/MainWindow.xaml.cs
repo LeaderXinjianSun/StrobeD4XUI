@@ -46,7 +46,7 @@ namespace D4XUI
         string CurrentAlarmStr = "";
         string DangbanFirstProduct = "";
         string LastBanci = "";
-        int timetick = 0;
+        //int timetick = 0;
         DateTime LasSam, NowSam;
         public static SampleWindow SampleWindow = null;
         double Yield = 0, _efficiency = 0, _variation = 0;
@@ -56,16 +56,16 @@ namespace D4XUI
             InitializeComponent();
 
             dispatcherTimer.Tick += new EventHandler(DispatcherTimerTickUpdateUi);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);//0.1s
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);//0.2s
 
         }
         private void MsgTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             MsgTextBox.ScrollToEnd();
         }
-        private void DispatcherTimerTickUpdateUi(Object sender, EventArgs e)
+        private async void DispatcherTimerTickUpdateUi(Object sender, EventArgs e)
         {
-            timetick++;
+            //timetick++;
             MsgTextBox.Text = MessageStr;
             PLCStatusEllipse.Fill = plcstate ? Brushes.Green : Brushes.Red;
             #region 大数据
@@ -86,7 +86,7 @@ namespace D4XUI
                                 string _ip = GetIp();
                                 string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                                 string _faulttime = "0";
-                                BigDataInsert(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime);
+                                await BigDataInsert(_ip, 治具编号.Text, 线体.Text, 测试料号.Text, _class, AlarmList[i].Content, AlarmList[i].Start.ToString(), _faulttime);
                             }
                         }
                         else
@@ -96,7 +96,7 @@ namespace D4XUI
                             string _ip = GetIp();
                             string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                             string _faulttime = (AlarmList[i].End - AlarmList[i].Start).TotalMinutes.ToString("F0");
-                            BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);
+                            await BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);
                         }
                     }
                 }
@@ -104,50 +104,50 @@ namespace D4XUI
             }
             #endregion
             #region 数据统计
-            if (timetick > 10)
-            {
-                timetick = 0;
+            //if (timetick > 10)
+            //{
+            //    timetick = 0;
 
-                if (HD200 != null && plcstate)
+            if (HD200 != null && plcstate)
+            {
+                #region 总直通率
+                if (HD200[0] == 0)
                 {
-                    #region 总直通率
-                    if (HD200[0] == 0)
-                    {
-                        Yield = 0;
-                    }
-                    else
-                    {
-                        Yield = HD200[3] / HD200[0] * 100;
-                    }
-                    //总直通率
-                    #endregion
-                    #region 工作效率
-                    DateTime _StartTime;
-                    if (DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20)
-                    {
-                        _StartTime = Convert.ToDateTime("08:00:00");
-                    }
-                    else
-                    {
-                        if (DateTime.Now.Hour < 8)
-                        {
-                            _StartTime = Convert.ToDateTime("20:00:00").AddDays(-1);
-                        }
-                        else
-                        {
-                            _StartTime = Convert.ToDateTime("20:00:00");
-                        }
-                    }
-                    double _totalmin = (DateTime.Now - _StartTime).TotalMinutes;
-                    double _workmin = _totalmin - HD200[10] - HD200[11] - HD200[12] - HD200[13];
-                    _efficiency = HD200[3] / _workmin / HD200[4] * 60;
-                    //工作效率
-                    #endregion
-                    #region 影响比例
-                    _variation = (HD200[10] + HD200[11] + HD200[12] + HD200[13]) / 10 / _totalmin;
-                    //影响比例
-                    #endregion
+                    Yield = 0;
                 }
+                else
+                {
+                    Yield = HD200[3] / HD200[0] * 100;
+                }
+                //总直通率
+                #endregion
+                #region 工作效率
+                DateTime _StartTime;
+                if (DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20)
+                {
+                    _StartTime = Convert.ToDateTime("08:00:00");
+                }
+                else
+                {
+                    if (DateTime.Now.Hour < 8)
+                    {
+                        _StartTime = Convert.ToDateTime("20:00:00").AddDays(-1);
+                    }
+                    else
+                    {
+                        _StartTime = Convert.ToDateTime("20:00:00");
+                    }
+                }
+                double _totalmin = (DateTime.Now - _StartTime).TotalMinutes;
+                double _workmin = _totalmin - HD200[10] - HD200[11] - HD200[12] - HD200[13];
+                _efficiency = HD200[3] / _workmin / HD200[4] * 60;
+                //工作效率
+                #endregion
+                #region 影响比例
+                _variation = (HD200[10] + HD200[11] + HD200[12] + HD200[13]) / 10 / _totalmin;
+                //影响比例
+                #endregion
+                //}
             }
             #endregion
             #region 样本
@@ -518,7 +518,7 @@ namespace D4XUI
             //}
         }
 
-        double D1200;
+        //double D1200;
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -532,13 +532,13 @@ namespace D4XUI
             Random rd = new Random();
             while (true)
             {
-                System.Threading.Thread.Sleep(50);
+                //System.Threading.Thread.Sleep(50);
                 plcstate = Xinjie.ReadSM(0);
                 if (plcstate)
                 {
                     M10000 = Xinjie.ReadMultiMCoil(11000);//读160个M
                     HD200 = Xinjie.readMultiHD(200);//读30个双字（32位）
-                    D1200 = Xinjie.ReadW(1200);//读1个字（16位）
+                    //D1200 = Xinjie.ReadW(1200);//读1个字（16位）
                     Xinjie.WriteW(1201, rd.Next(0, 99).ToString());
                     Xinjie.WriteW(400, (Yield * 10).ToString("F0"));
                     Xinjie.WriteW(403, (_efficiency * 100).ToString("F0"));
@@ -703,7 +703,7 @@ namespace D4XUI
             while (true)
             {
                 sw.Restart();
-                await Task.Delay(100);
+                await Task.Delay(10);
                 #region 读取PLC信号
                 try
                 {
@@ -975,23 +975,24 @@ namespace D4XUI
                     string path = "C:\\Debug\\" + DateTime.Now.ToString("yyyyMMdd") + "\\" + DateTime.Now.ToString("yyyyMMddHHmmss") + "AlarmTotal.csv";
                     string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                     string _ip = GetIp();
-                    string _date = DateTime.Now.ToString("yyyyMMdd");
+                    string _date;
+                    if (DateTime.Now.Hour < 8)
+                    {
+                        _date = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
+                    }
+                    else
+                    {
+                        _date = DateTime.Now.ToString("yyyyMMdd");
+                    }
                     MySqlConnection conn = null;
                     string StrMySQL = "Server=10.89.164.62;Database=dcdb;Uid=dcu;Pwd=dcudata;pooling=false;CharSet=utf8;port=3306";
                     conn = new MySqlConnection(StrMySQL);
                     conn.Open();
                     string stm;
-                    if (DateTime.Now.Hour > 8)
-                    {
+
                         stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip +
                                 "' AND TDATE = '" + _date + "' AND CLASS = '" + _class + "' AND FL01 = '" + "OFF'";
-                    }
-                    else
-                    {
-                        string _date1 = DateTime.Now.AddDays(-1).ToString("yyyyMMdd");
-                        stm = "SELECT * FROM TED_FAULT_DATA WHERE COMPUTERIP ='" + _ip +
-                                "' AND TDATE IN ('" + _date + "','" + _date1 + "') AND CLASS = '" + _class + "'AND FL01 = '" + "OFF'";
-                    }
+
                     DataSet ds = new DataSet();
                     MySqlDataAdapter myadp = new MySqlDataAdapter(stm, conn); //适配器 
                     myadp.Fill(ds, "table0");
@@ -1155,7 +1156,7 @@ namespace D4XUI
         /// <param name="FAULTTIME">故障时长(min)</param>
         /// <param name="FL01">预留字段/治具故障报警/OFF</param>
         /// <returns></returns>
-        private async void BigDataInsert(string COMPUTERIP,string MACID,string LINEID,string PARTNUM,string CLASS,string FAULTID,string FAULTSTARTTIME,string FAULTTIME)
+        private async Task BigDataInsert(string COMPUTERIP,string MACID,string LINEID,string PARTNUM,string CLASS,string FAULTID,string FAULTSTARTTIME,string FAULTTIME)
         {
             int result = await Task.Run<int>(() =>
             {
@@ -1196,7 +1197,7 @@ namespace D4XUI
             });
             AddMessage("上传报警" + result.ToString());
         }
-        private async void BigDataUpdate(string ip, string content,string starttime,string _class,string faulttime)
+        private async Task BigDataUpdate(string ip, string content,string starttime,string _class,string faulttime)
         {
             int result = await Task.Run<int>(() =>
             {
