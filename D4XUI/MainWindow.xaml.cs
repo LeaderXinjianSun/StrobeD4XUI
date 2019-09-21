@@ -54,9 +54,19 @@ namespace D4XUI
         public MainWindow()
         {
             InitializeComponent();
+            System.Diagnostics.Process[] myProcesses = System.Diagnostics.Process.GetProcessesByName("D4XUI");//获取指定的进程名   
+            if (myProcesses.Length > 1) //如果可以获取到知道的进程名则说明已经启动
+            {
+                System.Windows.MessageBox.Show("不允许重复打开软件");
+                System.Windows.Application.Current.Shutdown();
+            }
+            else
+            {
+                dispatcherTimer.Tick += new EventHandler(DispatcherTimerTickUpdateUi);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);//0.2s
+            }
 
-            dispatcherTimer.Tick += new EventHandler(DispatcherTimerTickUpdateUi);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 200);//0.2s
+
 
         }
         private void MsgTextBox_TextChanged(object sender, TextChangedEventArgs e)
