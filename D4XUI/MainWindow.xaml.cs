@@ -48,6 +48,7 @@ namespace D4XUI
         string LastBanci = "";
         //int timetick = 0;
         DateTime LasSam, NowSam;
+        DateTime SamStartDatetime, SamDate, SamDateBigin;
         public static SampleWindow SampleWindow = null;
         double Yield = 0, _efficiency = 0, _variation = 0;
         #endregion
@@ -161,7 +162,7 @@ namespace D4XUI
             }
             #endregion
             #region 样本
-            DateTime SamStartDatetime, SamDate, SamDateBigin;
+            
             if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
             {
                 //上午
@@ -209,17 +210,29 @@ namespace D4XUI
                     IsInSampleMode = false;
                     SampleBarcode.Clear();
                 }
-                SampleGrid.Visibility = (DateTime.Now - SamDate).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample || (IsInSampleMode && !SampleTestAbort) ? Visibility.Visible : Visibility.Collapsed;
-                SampleTextBlock.Text = IsInSampleMode ? "样本测试中" : "请测样本";
-                if (!SampleTestAbort && !IsInSampleMode && (DateTime.Now - SamStartDatetime).TotalSeconds > 0 && IsSample && (SamDateBigin - LasSam).TotalSeconds > 0)
+                SampleGrid.Visibility = (DateTime.Now - SamDateBigin).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample ? Visibility.Visible : Visibility.Collapsed;
+                if ((DateTime.Now - SamDateBigin).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample)
                 {
-                    Xinjie.SetM(11110, true);
-                    Xinjie.SetM(11112, false);
-                    SampleTestFinished = false;
-                    SampleBarcode.Clear();
-                    NowSam = DateTime.Now;
-                    AddMessage("开始样本测试");
+                    if (IsInSampleMode)
+                    {
+                        SampleTextBlock.Text = "样本测试中";
+                    }
+                    else
+                    {
+                        if ((DateTime.Now - SamStartDatetime).TotalSeconds < 0)
+                        {
+                            SampleTextBlock.Text = "请测样本";
+                        }
+                        else
+                        {
+                            SampleTextBlock.Text = "强制样本";
+                            if (!M10000[116])
+                            {
+                                Xinjie.SetM(11116, true);
+                            }
 
+                        }
+                    }
                 }
                 if (IsInSampleMode && SampleTestFinished)
                 {
@@ -229,13 +242,15 @@ namespace D4XUI
                     if (res)
                     {
                         AddMessage("样本测试成功");
+                        SampleBarcode.Clear();
                         LasSam = DateTime.Now;
                         LastSampleTime.Text = LasSam.ToString();
                         Inifile.INIWriteValue(iniParameterPath, "Sample", "LastSample", LasSam.ToString());
+                        Xinjie.SetM(11116, false);
                     }
                     else
                     {
-                        NowSam = DateTime.Now;
+                        //NowSam = DateTime.Now;
                         AddMessage("样本测试失败");
                     }
                     Xinjie.SetM(11115, true);
@@ -279,7 +294,7 @@ namespace D4XUI
             dispatcherTimer.Start();
             UDPWork();
             UDPWorkVPP();
-            NowSam = DateTime.Now;
+            //NowSam = DateTime.Now;
         }
         private void LoadAlarmNames()
         {
@@ -412,14 +427,15 @@ namespace D4XUI
             }
 
             string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";
-            try
-            {
-                IsSample = bool.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "IsSample", "True"));
-            }
-            catch
-            {
-                IsSample = true;
-            }
+            //try
+            //{
+            //    IsSample = bool.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "IsSample", "True"));
+            //}
+            //catch
+            //{
+            //    IsSample = true;
+            //}
+            IsSample = true;
             try
             {
                 NGItemCount = int.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemCount", "9"));
@@ -469,10 +485,9 @@ namespace D4XUI
             if (!SampleTestAbort && !IsInSampleMode && IsSample && plcstate)
             {
                 Xinjie.SetM(11110, true);
-                Xinjie.SetM(11112, false);
-                SampleTestFinished = false;
-                SampleBarcode.Clear();
-                NowSam = DateTime.Now;
+                IsInSampleMode = true;
+                Xinjie.SetM(11112, false);                
+                //NowSam = DateTime.Now;
                 AddMessage("开始样本测试");
             }
         }
@@ -1070,7 +1085,7 @@ namespace D4XUI
                             selectSqlStr += "'" + item + "',";
                         }
                         selectSqlStr = selectSqlStr.Substring(0, selectSqlStr.Length - 1);
-                        selectSqlStr += ") and sdate > to_date('" + NowSam.ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
+                        selectSqlStr += ") and sdate > to_date('" + SamDateBigin.ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
                         DataSet s = oraDB.selectSQL2(selectSqlStr);
                         DataTable dt = s.Tables[0];
                         string Columns = "";

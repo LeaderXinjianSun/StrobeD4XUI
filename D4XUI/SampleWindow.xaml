@@ -99,7 +99,7 @@
                     <ComboBoxItem>ZP</ComboBoxItem>
                     <ComboBoxItem>FCT</ComboBoxItem>
                 </ComboBox>
-                <CheckBox Name="IsSampleCheck" Grid.Column="3" Content="允许样本" VerticalAlignment="Center" HorizontalAlignment="Center"></CheckBox>
+                <CheckBox Name="IsSampleCheck" Grid.Column="3" Content="允许样本" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed"></CheckBox>
                 <StackPanel HorizontalAlignment="Center" Grid.Column="3" Grid.Row="1" Orientation="Horizontal">
                     <TextBlock Text="不良项数" VerticalAlignment="Center"></TextBlock>
                     <TextBox Name="NGItemCount" Margin="1" Width="50" Text="9" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
