@@ -151,7 +151,7 @@ namespace D4XUI
                 }
                 double _totalmin = (DateTime.Now - _StartTime).TotalMinutes;
                 double _workmin = _totalmin - HD200[10] - HD200[11] - HD200[12] - HD200[13];
-                _efficiency = HD200[3] / _workmin / HD200[4] * 60;
+                _efficiency = HD200[3] / (_workmin * HD200[4] / 60);
                 //工作效率
                 #endregion
                 #region 影响比例
@@ -555,9 +555,11 @@ namespace D4XUI
         {
             string COM = Inifile.INIGetStringValue(iniParameterPath, "PLC", "COM", "COM19");
             Random rd = new Random();
+            Stopwatch sw = new Stopwatch();
             while (true)
             {
                 //System.Threading.Thread.Sleep(50);
+                sw.Restart();
                 plcstate = Xinjie.ReadSM(0);
                 if (plcstate)
                 {
@@ -566,8 +568,9 @@ namespace D4XUI
                     //D1200 = Xinjie.ReadW(1200);//读1个字（16位）
                     Xinjie.WriteW(1201, rd.Next(0, 99).ToString());
                     Xinjie.WriteW(400, (Yield * 10).ToString("F0"));
-                    Xinjie.WriteW(403, (_efficiency * 100).ToString("F0"));
+                    Xinjie.WriteW(403, (_efficiency * 1000).ToString("F0"));
                     Xinjie.WriteW(404, (_variation * 1000).ToString("F0"));
+
                 }
                 else
                 {
@@ -576,6 +579,8 @@ namespace D4XUI
                     Xinjie.ModbusInit(COM, 19200, System.IO.Ports.Parity.Even, 8, System.IO.Ports.StopBits.One);
                     Xinjie.ModbusConnect();
                 }
+                this.Dispatcher.Invoke(new Action(() => { CycleText.Text = sw.ElapsedMilliseconds.ToString() + "ms"; }));
+               
             }
         }
         #endregion
@@ -723,11 +728,10 @@ namespace D4XUI
 
         async void UDPWorkVPP()
         {
-            Stopwatch sw = new Stopwatch();
             bool first = true;
             while (true)
             {
-                sw.Restart();
+                
                 await Task.Delay(10);
                 #region 读取PLC信号
                 try
@@ -880,7 +884,7 @@ namespace D4XUI
                     AddMessage(ex.Message);
                 }
                 
-                CycleText.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                
                 #endregion
             }
         }
@@ -1111,35 +1115,17 @@ namespace D4XUI
 
                         //匹配不良项数量是否满足
                         int[] counts = new int[NGItemCount];
+                        //匹配是否测试正确
+
                         for (int i = 0; i < NGItemCount; i++)
                         {
-                            for (int j = 0; j < dt.Rows.Count; j++)
-                            {
-                                if (((string)dt.Rows[j]["NGITEM"]).Contains(NGItems[i, 0]) && NGItems[i, 1] == (string)dt.Rows[j]["SITEM"])
-                                {
-                                    counts[i]++;
-                                }
-                            }
+                            DataRow[] dtr = dt.Select(string.Format("NGITEM = '{0}' AND SITEM = '{1}' AND TRES = '{2}'", NGItems[i, 0].ToString(), NGItems[i, 1].ToString(), NGItems[i, 0].ToString()));
+                            counts[i] = dtr.Length;
+                            AddMessage(NGItems[i, 1].ToString() + ":"+ NGItems[i, 0].ToString() + "共 " + dtr.Length.ToString() + " 条");
                         }
                         for (int i = 0; i < NGItemCount; i++)
                         {
                             if (counts[i] <= 0)
-                            {
-                                AddMessage("样本测试数量不足");
-                                return false;
-                            }
-                        }
-                        //匹配是否测试正确
-                        for (int j = 0; j < dt.Rows.Count; j++)
-                        {
-                            if ((string)dt.Rows[j]["TRES"] != (string)dt.Rows[j]["NGITEM"])
-                            {
-                                AddMessage((string)dt.Rows[j]["BARCODE"] + "应该是" + (string)dt.Rows[j]["NGITEM"] + ",却测成了" + (string)dt.Rows[j]["TRES"]);
-                            }
-                        }
-                        for (int j = 0; j < dt.Rows.Count; j++)
-                        {
-                            if ((string)dt.Rows[j]["TRES"] != (string)dt.Rows[j]["NGITEM"])
                             {
                                 return false;
                             }
