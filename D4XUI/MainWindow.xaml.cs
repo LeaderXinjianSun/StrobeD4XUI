@@ -48,7 +48,7 @@ namespace D4XUI
         string LastBanci = "";
         //int timetick = 0;
         DateTime LasSam, NowSam;
-        DateTime SamStartDatetime, SamDate, SamDateBigin;
+        DateTime SamStartDatetime, SamDateBigin,SamNext;
         public static SampleWindow SampleWindow = null;
         double Yield = 0, _efficiency = 0, _variation = 0;
         #endregion
@@ -162,41 +162,67 @@ namespace D4XUI
             }
             #endregion
             #region 样本
-            
-            if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
+            string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";
+            string SamSpan = Inifile.INIGetStringValue(iniSamplePath, "Sample", "SamMode", "Null") == "2h" ? "2h" : "6h";
+            switch (SamSpan)
             {
-                //上午
-                SamStartDatetime = Convert.ToDateTime("08:00:00");
-                SamDate = Convert.ToDateTime("07:00:00");
-                SamDateBigin = Convert.ToDateTime("06:00:00");
-            }
-            else
-            {
-                if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
-                {
-                    //下午
-                    SamStartDatetime = Convert.ToDateTime("14:00:00");
-                    SamDate = Convert.ToDateTime("13:00:00");
-                    SamDateBigin = Convert.ToDateTime("12:00:00");
-                }
-                else
-                {
-                    if (DateTime.Now.Hour >= 18)
+                case "2h":
+                    if (DateTime.Now.Hour % 2 == 0)
                     {
-                        //前夜
-                        SamStartDatetime = Convert.ToDateTime("20:00:00");
-                        SamDate = Convert.ToDateTime("19:00:00");
-                        SamDateBigin = Convert.ToDateTime("18:00:00");
+                        SamDateBigin = Convert.ToDateTime(DateTime.Now.Hour.ToString() + ":00:00");
+                        SamStartDatetime = SamDateBigin.AddMinutes(30);
+                        SamNext = SamDateBigin.AddHours(2);
                     }
                     else
                     {
-                        //后夜
-                        SamStartDatetime = Convert.ToDateTime("02:00:00");
-                        SamDate = Convert.ToDateTime("01:00:00");
-                        SamDateBigin = Convert.ToDateTime("00:00:00");
+                        SamDateBigin = Convert.ToDateTime(DateTime.Now.AddHours(-1).Hour.ToString() + ":00:00");
+                        SamStartDatetime = SamDateBigin.AddMinutes(30);
+                        SamNext = SamDateBigin.AddHours(2);
                     }
-                }
+                    break;
+                case "6h":
+                    if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
+                    {
+                        //上午
+                        SamStartDatetime = Convert.ToDateTime("08:00:00");
+                        SamNext = Convert.ToDateTime("12:00:00");
+                        SamDateBigin = Convert.ToDateTime("06:00:00");
+                    }
+                    else
+                    {
+                        if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
+                        {
+                            //下午
+                            SamStartDatetime = Convert.ToDateTime("14:00:00");
+                            SamNext = Convert.ToDateTime("18:00:00");
+                            SamDateBigin = Convert.ToDateTime("12:00:00");
+                        }
+                        else
+                        {
+                            if (DateTime.Now.Hour >= 18)
+                            {
+                                //前夜
+                                SamStartDatetime = Convert.ToDateTime("20:00:00");
+                                SamNext = Convert.ToDateTime("00:00:00").AddDays(+1);
+                                SamDateBigin = Convert.ToDateTime("18:00:00");
+                            }
+                            else
+                            {
+                                //后夜
+                                SamStartDatetime = Convert.ToDateTime("02:00:00");
+                                SamNext = Convert.ToDateTime("06:00:00");
+                                SamDateBigin = Convert.ToDateTime("00:00:00");
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
+
+            
+            NextSampleTime.Text = ((SamDateBigin - LasSam).TotalSeconds > 0 ? SamStartDatetime : SamNext).ToString();
+            SpanSampleTime.Text = (((SamDateBigin - LasSam).TotalSeconds > 0 ? SamStartDatetime : SamNext) - DateTime.Now).ToString().Split(new string[] { "."}, StringSplitOptions.RemoveEmptyEntries)[0];
             if (M10000 != null && plcstate)
             {
                 IsInSampleMode = M10000[110];
@@ -803,6 +829,10 @@ namespace D4XUI
                             M10142 = M10000[142];
                             if (M10142)
                             {
+                                LingminduBarcode1.Text = "Null";
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode1", LingminduBarcode1.Text);
+                                LingminduBarcode2.Text = "Null";
+                                Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
                                 string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
                                 await udp2.SendAsync(sends);
                                 AddMessage("向灵敏度补发 " + sends);

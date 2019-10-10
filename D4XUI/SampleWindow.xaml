@@ -104,6 +104,13 @@
                     <TextBlock Text="不良项数" VerticalAlignment="Center"></TextBlock>
                     <TextBox Name="NGItemCount" Margin="1" Width="50" Text="9" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                 </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Grid.Column="3" Grid.Row="2" Orientation="Horizontal">
+                    <TextBlock Text="样本模式" VerticalAlignment="Center"></TextBlock>
+                    <ComboBox Name="SamMode" Margin="10,0,0,0">
+                        <ComboBoxItem Content="2h"></ComboBoxItem>
+                        <ComboBoxItem Content="6h"></ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
             </Grid>
         </Grid>
     </Grid>

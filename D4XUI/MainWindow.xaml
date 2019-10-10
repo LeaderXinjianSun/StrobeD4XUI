@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 2019092601" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Title="D4XUI 2019101001" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
@@ -47,13 +47,13 @@
             </Grid>
         </Grid>
         <TextBox Margin="1" x:Name="MsgTextBox" Grid.Row="1" IsReadOnly="True" TextChanged="MsgTextBox_TextChanged"  FontSize="14" Background="Black" FontFamily="宋体" Foreground="White" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="0"></TextBox>
-     
+
         <Grid Grid.Column="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"></RowDefinition>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
-                <RowDefinition Height="100"></RowDefinition>
+                <RowDefinition Height="150"></RowDefinition>
             </Grid.RowDefinitions>
             <StackPanel VerticalAlignment="Center">
                 <!--<Button Width="80" Height="30" Content="功能" Click="Button_Click"></Button>-->
@@ -101,7 +101,7 @@
                         <TextBlock Name="WaitTiemojiforinput" Width="60"></TextBlock>
                         <TextBlock Text="min" Width="30"></TextBlock>
                     </StackPanel>-->
-                    
+
                     <!--<StackPanel Orientation="Horizontal">
                         <TextBlock Text="上料机投入数量" Width="100"></TextBlock>
                         <TextBlock Name="input" Width="60"></TextBlock>
@@ -194,7 +194,7 @@
                     </StackPanel>-->
                 </StackPanel>
             </Grid>
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="1">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="治具编号" Width="60"></TextBlock>
@@ -212,25 +212,33 @@
                     <Button Name="AlarmButton" Content="Alarm" Width="60" Height="30" HorizontalAlignment="Right" Margin="10" Click="AlarmButton_Click"></Button>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Row="3">
+            <Grid Grid.Row="2" Grid.RowSpan="2">
                 <Canvas>
                     <Button Name="SampleButton" Canvas.Left="10" Canvas.Top="10" Height="30" Width="80" Content="样本" Click="SampleButton_Click"></Button>
                     <StackPanel Canvas.Left="10" Canvas.Top="50" Orientation="Vertical">
-                        <TextBlock Text="上次测样本时刻:"></TextBlock>
-                        <TextBlock Name="LastSampleTime"></TextBlock>
+                        <TextBlock Text="上次测样本时刻:"/>
+                        <TextBlock x:Name="LastSampleTime"/>
+                    </StackPanel>
+                    <StackPanel Canvas.Left="10" Canvas.Top="100" Orientation="Vertical">
+                        <TextBlock Text="下次测样本时刻:"/>
+                        <TextBlock x:Name="NextSampleTime"/>
+                    </StackPanel>
+                    <StackPanel Canvas.Left="10" Canvas.Top="150" Orientation="Vertical">
+                        <TextBlock Text="样本倒计时:"/>
+                        <TextBlock x:Name="SpanSampleTime" Foreground="Purple" FontSize="20"/>
                     </StackPanel>
                     <!--<Button Name="FuncButton" Canvas.Left="100" Canvas.Top="10" Height="30" Width="80" Content="功能" Click="FuncButton_Click"></Button>-->
                     <Button Name="ManulSampleButton" Canvas.Left="100" Canvas.Top="10" Height="30" Width="80" Content="手动" Click="ManulSampleButton_Click"></Button>
                 </Canvas>
             </Grid>
         </Grid>
-            
+
         <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
             <Label>PLC</Label>
             <Ellipse Name="PLCStatusEllipse" Width="20" Height="20"></Ellipse>
             <Label>Cycle</Label>
             <TextBlock Name="CycleText"></TextBlock>
-            
+
         </StatusBar>
     </Grid>
 </Window>

@@ -57,6 +57,9 @@ namespace D4XUI
             Inifile.INIWriteValue(iniSamplePath, "Sample", "NGItemClassify8", NGItemClassify8.Text);
             Inifile.INIWriteValue(iniSamplePath, "Sample", "NGItemClassify9", NGItemClassify9.Text);
             Inifile.INIWriteValue(iniSamplePath, "Sample", "NGItemClassify10", NGItemClassify10.Text);
+
+            
+            Inifile.INIWriteValue(iniSamplePath, "Sample", "SamMode", SamMode.Text);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -100,6 +103,8 @@ namespace D4XUI
             NGItemClassify8.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemClassify8", "Null") == "ZP" ? "ZP" : "FCT";
             NGItemClassify9.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemClassify9", "Null") == "ZP" ? "ZP" : "FCT";
             NGItemClassify10.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemClassify10", "Null") == "ZP" ? "ZP" : "FCT";
+
+            SamMode.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "SamMode", "Null") == "2h" ? "2h" : "6h";
         }
 
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
