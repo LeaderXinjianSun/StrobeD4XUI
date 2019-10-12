@@ -42,13 +42,14 @@ namespace D4XUI
         private string iniTimelyRainPath = System.Environment.CurrentDirectory + "\\TimelyRain.ini";
         string alarmExcelPath = System.Environment.CurrentDirectory + "\\D4X报警.xlsx";
         string alarmExcelPath1 = System.Environment.CurrentDirectory + "\\D4X条码.xlsx";
+        string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";
         List<AlarmData> AlarmList = new List<AlarmData>();
         string CurrentAlarmStr = "";
         string DangbanFirstProduct = "";
         string LastBanci = "";
         //int timetick = 0;
         DateTime LasSam, NowSam;
-        DateTime SamStartDatetime, SamDateBigin,SamNext;
+        DateTime SamStartDatetime, SamDateBigin;
         public static SampleWindow SampleWindow = null;
         double Yield = 0, _efficiency = 0, _variation = 0;
         #endregion
@@ -107,7 +108,10 @@ namespace D4XUI
                             string _ip = GetIp();
                             string _class = DateTime.Now.Hour >= 8 && DateTime.Now.Hour < 20 ? "D" : "N";
                             string _faulttime = (AlarmList[i].End - AlarmList[i].Start).TotalMinutes.ToString("F0");
-                            await BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);
+                            if ((AlarmList[i].End - AlarmList[i].Start).TotalHours <= 2 && (AlarmList[i].End - AlarmList[i].Start).TotalHours > 0)
+                            {
+                                await BigDataUpdate(_ip, AlarmList[i].Content, AlarmList[i].Start.ToString(), _class, _faulttime);
+                            }
                         }
                     }
                 }
@@ -162,67 +166,71 @@ namespace D4XUI
             }
             #endregion
             #region 样本
-            string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";
+            
             string SamSpan = Inifile.INIGetStringValue(iniSamplePath, "Sample", "SamMode", "Null") == "2h" ? "2h" : "6h";
             switch (SamSpan)
             {
                 case "2h":
-                    if (DateTime.Now.Hour % 2 == 0)
-                    {
-                        SamDateBigin = Convert.ToDateTime(DateTime.Now.Hour.ToString() + ":00:00");
-                        SamStartDatetime = SamDateBigin.AddMinutes(30);
-                        SamNext = SamDateBigin.AddHours(2);
-                    }
-                    else
-                    {
-                        SamDateBigin = Convert.ToDateTime(DateTime.Now.AddHours(-1).Hour.ToString() + ":00:00");
-                        SamStartDatetime = SamDateBigin.AddMinutes(30);
-                        SamNext = SamDateBigin.AddHours(2);
-                    }
+                    //if (DateTime.Now.Hour % 2 == 0)
+                    //{
+                    //    SamDateBigin = Convert.ToDateTime(DateTime.Now.Hour.ToString() + ":00:00");
+                    //    SamStartDatetime = SamDateBigin.AddMinutes(30);
+                    //    SamNext = SamDateBigin.AddHours(2);
+                    //}
+                    //else
+                    //{
+                    //    SamDateBigin = Convert.ToDateTime(DateTime.Now.AddHours(-1).Hour.ToString() + ":00:00");
+                    //    SamStartDatetime = SamDateBigin.AddMinutes(30);
+                    //    SamNext = SamDateBigin.AddHours(2);
+                    //}
+                    SamDateBigin = LasSam.AddMinutes(90);
+                    SamStartDatetime = LasSam.AddHours(2);
                     break;
                 case "6h":
-                    if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
-                    {
-                        //上午
-                        SamStartDatetime = Convert.ToDateTime("08:00:00");
-                        SamNext = Convert.ToDateTime("12:00:00");
-                        SamDateBigin = Convert.ToDateTime("06:00:00");
-                    }
-                    else
-                    {
-                        if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
-                        {
-                            //下午
-                            SamStartDatetime = Convert.ToDateTime("14:00:00");
-                            SamNext = Convert.ToDateTime("18:00:00");
-                            SamDateBigin = Convert.ToDateTime("12:00:00");
-                        }
-                        else
-                        {
-                            if (DateTime.Now.Hour >= 18)
-                            {
-                                //前夜
-                                SamStartDatetime = Convert.ToDateTime("20:00:00");
-                                SamNext = Convert.ToDateTime("00:00:00").AddDays(+1);
-                                SamDateBigin = Convert.ToDateTime("18:00:00");
-                            }
-                            else
-                            {
-                                //后夜
-                                SamStartDatetime = Convert.ToDateTime("02:00:00");
-                                SamNext = Convert.ToDateTime("06:00:00");
-                                SamDateBigin = Convert.ToDateTime("00:00:00");
-                            }
-                        }
-                    }
+                    //if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 12)
+                    //{
+                    //    //上午
+                    //    SamStartDatetime = Convert.ToDateTime("08:00:00");
+                    //    SamNext = Convert.ToDateTime("12:00:00");
+                    //    SamDateBigin = Convert.ToDateTime("06:00:00");
+                    //}
+                    //else
+                    //{
+                    //    if (DateTime.Now.Hour >= 12 && DateTime.Now.Hour < 18)
+                    //    {
+                    //        //下午
+                    //        SamStartDatetime = Convert.ToDateTime("14:00:00");
+                    //        SamNext = Convert.ToDateTime("18:00:00");
+                    //        SamDateBigin = Convert.ToDateTime("12:00:00");
+                    //    }
+                    //    else
+                    //    {
+                    //        if (DateTime.Now.Hour >= 18)
+                    //        {
+                    //            //前夜
+                    //            SamStartDatetime = Convert.ToDateTime("20:00:00");
+                    //            SamNext = Convert.ToDateTime("00:00:00").AddDays(+1);
+                    //            SamDateBigin = Convert.ToDateTime("18:00:00");
+                    //        }
+                    //        else
+                    //        {
+                    //            //后夜
+                    //            SamStartDatetime = Convert.ToDateTime("02:00:00");
+                    //            SamNext = Convert.ToDateTime("06:00:00");
+                    //            SamDateBigin = Convert.ToDateTime("00:00:00");
+                    //        }
+                    //    }
+                    //}
+                    SamDateBigin = LasSam.AddHours(4);
+                    SamStartDatetime = LasSam.AddHours(6);
                     break;
                 default:
                     break;
             }
 
-            
-            NextSampleTime.Text = ((SamDateBigin - LasSam).TotalSeconds > 0 ? SamStartDatetime : SamNext).ToString();
-            SpanSampleTime.Text = (((SamDateBigin - LasSam).TotalSeconds > 0 ? SamStartDatetime : SamNext) - DateTime.Now).ToString().Split(new string[] { "."}, StringSplitOptions.RemoveEmptyEntries)[0];
+
+            NextSampleTime.Text = SamStartDatetime.ToString();
+            SpanSampleTime.Text = (SamStartDatetime - DateTime.Now).ToString().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]; ;
             if (M10000 != null && plcstate)
             {
                 IsInSampleMode = M10000[110];
@@ -236,8 +244,8 @@ namespace D4XUI
                     IsInSampleMode = false;
                     SampleBarcode.Clear();
                 }
-                SampleGrid.Visibility = (DateTime.Now - SamDateBigin).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample ? Visibility.Visible : Visibility.Collapsed;
-                if ((DateTime.Now - SamDateBigin).TotalSeconds > 0 && (SamDateBigin - LasSam).TotalSeconds > 0 && IsSample)
+                SampleGrid.Visibility = (DateTime.Now - SamDateBigin).TotalSeconds > 0 && IsSample ? Visibility.Visible : Visibility.Collapsed;
+                if ((DateTime.Now - SamDateBigin).TotalSeconds > 0 && IsSample)
                 {
                     if (IsInSampleMode)
                     {
@@ -830,8 +838,10 @@ namespace D4XUI
                             if (M10142)
                             {
                                 LingminduBarcode1.Text = "Null";
+                                LingminduBarcode1.Background = Brushes.White;
                                 Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode1", LingminduBarcode1.Text);
                                 LingminduBarcode2.Text = "Null";
+                                LingminduBarcode2.Background = Brushes.White;
                                 Inifile.INIWriteValue(iniParameterPath, "Barcode", "LingminduBarcode2", LingminduBarcode2.Text);
                                 string sends = "SN1:" + LingminduBarcode1.Text + ",P" + ";" + "SN2:" + LingminduBarcode2.Text + ",P" + "\r\n";
                                 await udp2.SendAsync(sends);
@@ -1111,15 +1121,12 @@ namespace D4XUI
                     OraDB oraDB = new OraDB("zdtdb", "ictdata", "ictdata*168");
                     if (oraDB.isConnect())
                     {
+                        //select * from up_date where update >= to_date('2007-09-07 00:00:00','yyyy-mm-dd hh24:mi:ss')
                         //select* from barsamrec where barcode in ('G5Y796383C9LQ5919SAT','G5Y9321RAH5K7QC8V-G') and sdate > to_date('2019/8/16 18:45:16', 'yyyy/mm/dd hh24:mi:ss')
-                        string selectSqlStr = "select * from barsamrec where barcode in （";
-                        foreach (var item in SampleBarcode)
-                        {
-                            AddMessage(item);
-                            selectSqlStr += "'" + item + "',";
-                        }
-                        selectSqlStr = selectSqlStr.Substring(0, selectSqlStr.Length - 1);
-                        selectSqlStr += ") and sdate > to_date('" + SamDateBigin.ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
+                        string ZPMID = Inifile.INIGetStringValue(iniSamplePath, "Sample", "ZPMID", "ATKC4-012");
+                        string FCTMID = Inifile.INIGetStringValue(iniSamplePath, "Sample", "FCTMID", "ATKC4-012");
+                        string selectSqlStr = "select * from barsamrec where MNO in ('" + ZPMID + "','" + FCTMID + "') and sdate > to_date('" + DateTime.Now.AddHours(-2).ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
+                        AddMessage(selectSqlStr);
                         DataSet s = oraDB.selectSQL2(selectSqlStr);
                         DataTable dt = s.Tables[0];
                         string Columns = "";
@@ -1151,7 +1158,10 @@ namespace D4XUI
                         {
                             DataRow[] dtr = dt.Select(string.Format("NGITEM = '{0}' AND SITEM = '{1}' AND TRES = '{2}'", NGItems[i, 0].ToString(), NGItems[i, 1].ToString(), NGItems[i, 0].ToString()));
                             counts[i] = dtr.Length;
-                            AddMessage(NGItems[i, 1].ToString() + ":"+ NGItems[i, 0].ToString() + "共 " + dtr.Length.ToString() + " 条");
+                            if (dtr.Length == 0)
+                            {
+                                AddMessage(NGItems[i, 1].ToString() + ":" + NGItems[i, 0].ToString() + "没测到该样本项");
+                            }                            
                         }
                         for (int i = 0; i < NGItemCount; i++)
                         {

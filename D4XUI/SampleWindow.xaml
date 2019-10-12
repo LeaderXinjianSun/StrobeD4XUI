@@ -111,6 +111,14 @@
                         <ComboBoxItem Content="6h"></ComboBoxItem>
                     </ComboBox>
                 </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Grid.Column="3" Grid.Row="3" Orientation="Horizontal">
+                    <TextBlock Text="ZPMID: "></TextBlock>
+                    <TextBox Name="ZPMID" Width="60"></TextBox>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Grid.Column="3" Grid.Row="4" Orientation="Horizontal">
+                    <TextBlock Text="FCTMID: "></TextBlock>
+                    <TextBox Name="FCTMID" Width="60"></TextBox>
+                </StackPanel>
             </Grid>
         </Grid>
     </Grid>

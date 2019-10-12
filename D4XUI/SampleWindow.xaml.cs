@@ -60,6 +60,9 @@ namespace D4XUI
 
             
             Inifile.INIWriteValue(iniSamplePath, "Sample", "SamMode", SamMode.Text);
+
+            Inifile.INIWriteValue(iniSamplePath, "Sample", "ZPMID", ZPMID.Text);
+            Inifile.INIWriteValue(iniSamplePath, "Sample", "FCTMID", FCTMID.Text);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -105,6 +108,9 @@ namespace D4XUI
             NGItemClassify10.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemClassify10", "Null") == "ZP" ? "ZP" : "FCT";
 
             SamMode.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "SamMode", "Null") == "2h" ? "2h" : "6h";
+
+            ZPMID.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "ZPMID", "ATKC4-012");
+            FCTMID.Text = Inifile.INIGetStringValue(iniSamplePath, "Sample", "FCTMID", "ATKC4-016");
         }
 
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
