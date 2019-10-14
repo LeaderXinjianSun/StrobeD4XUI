@@ -230,7 +230,7 @@ namespace D4XUI
 
 
             NextSampleTime.Text = SamStartDatetime.ToString();
-            SpanSampleTime.Text = (SamStartDatetime - DateTime.Now).ToString().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0]; ;
+            SpanSampleTime.Text = (SamStartDatetime - DateTime.Now).ToString().Split(new string[] { "." }, StringSplitOptions.RemoveEmptyEntries)[0];
             if (M10000 != null && plcstate)
             {
                 IsInSampleMode = M10000[110];
@@ -1125,7 +1125,7 @@ namespace D4XUI
                         //select* from barsamrec where barcode in ('G5Y796383C9LQ5919SAT','G5Y9321RAH5K7QC8V-G') and sdate > to_date('2019/8/16 18:45:16', 'yyyy/mm/dd hh24:mi:ss')
                         string ZPMID = Inifile.INIGetStringValue(iniSamplePath, "Sample", "ZPMID", "ATKC4-012");
                         string FCTMID = Inifile.INIGetStringValue(iniSamplePath, "Sample", "FCTMID", "ATKC4-012");
-                        string selectSqlStr = "select * from barsamrec where MNO in ('" + ZPMID + "','" + FCTMID + "') and sdate > to_date('" + DateTime.Now.AddHours(-2).ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
+                        string selectSqlStr = "select * from barsamrec where MNO in ('" + ZPMID + "','" + FCTMID + "') and sdate > to_date('" + DateTime.Now.AddMinutes(-30).ToString() + "', 'yyyy/mm/dd hh24:mi:ss')";
                         AddMessage(selectSqlStr);
                         DataSet s = oraDB.selectSQL2(selectSqlStr);
                         DataTable dt = s.Tables[0];
