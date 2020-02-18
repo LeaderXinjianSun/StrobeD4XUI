@@ -461,15 +461,15 @@ namespace D4XUI
             }
 
             string iniSamplePath = System.Environment.CurrentDirectory + "\\Sample.ini";
-            //try
-            //{
-            //    IsSample = bool.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "IsSample", "True"));
-            //}
-            //catch
-            //{
-            //    IsSample = true;
-            //}
-            IsSample = true;
+            try
+            {
+                IsSample = bool.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "IsSample", "True"));
+            }
+            catch
+            {
+                IsSample = true;
+            }
+            //IsSample = true;
             try
             {
                 NGItemCount = int.Parse(Inifile.INIGetStringValue(iniSamplePath, "Sample", "NGItemCount", "9"));

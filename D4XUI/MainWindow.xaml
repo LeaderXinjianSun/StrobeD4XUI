@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:D4XUI"
         mc:Ignorable="d"
-        Title="D4XUI 20191014" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
-        Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="D5XUI 20200218" Height="600" Width="800" WindowStartupLocation ="CenterScreen" ResizeMode="CanResize"
+        Loaded="Window_Loaded" Icon="five_64px_1236460_easyicon.net.ico" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2.5*"></RowDefinition>
