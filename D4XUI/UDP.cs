@@ -38,7 +38,19 @@ namespace BingLibrary.Net.net
             }
             catch { return false; }
         }
-
+        public bool Connect(int localPort,string localIP, int targetPort, string targetIP)
+        {
+            try
+            {
+                IPEndPoint localIpEp = new IPEndPoint(IPAddress.Parse(localIP), localPort);
+                udp = new UdpClient(localIpEp);
+                udp.Client.SendTimeout = 200;
+                udp.Client.ReceiveTimeout = 200;
+                RemoteIpEndPoint = new IPEndPoint(IPAddress.Parse(targetIP), targetPort);
+                return true;
+            }
+            catch { return false; }
+        }
         public async Task<string> ReceiveAsync()
         {
             string tempS = "error";

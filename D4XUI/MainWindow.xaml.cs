@@ -625,14 +625,16 @@ namespace D4XUI
         {
             string ip;
             int localport, targetport;
-            ip = Inifile.INIGetStringValue(iniParameterPath, "转盘", "IP", "192.168.0.1");
+            string ip_l = Inifile.INIGetStringValue(iniParameterPath, "转盘", "LocalIP", "192.168.0.1");
+            ip = Inifile.INIGetStringValue(iniParameterPath, "转盘", "TargetIP", "192.168.0.1");
             localport = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "转盘", "LocalPort", "8001"));
             targetport = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "转盘", "TargetPort", "5000"));
-            udp1.Connect(localport, targetport, ip);
-            ip = Inifile.INIGetStringValue(iniParameterPath, "灵敏度", "IP", "192.168.0.10");
+            udp1.Connect(localport, ip_l, targetport, ip);
+            ip_l = Inifile.INIGetStringValue(iniParameterPath, "灵敏度", "LocalIP", "192.168.0.1");
+            ip = Inifile.INIGetStringValue(iniParameterPath, "灵敏度", "TargetIP", "192.168.0.10");
             localport = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "灵敏度", "LocalPort", "8002"));
             targetport = int.Parse(Inifile.INIGetStringValue(iniParameterPath, "灵敏度", "TargetPort", "5000"));
-            udp2.Connect(localport, targetport, ip);
+            udp2.Connect(localport, ip_l, targetport, ip);
 
         }
         async void UDPWork()
@@ -655,9 +657,9 @@ namespace D4XUI
                     }
                     
 
-                    string sends = "SNOK";
-                    await udp1.SendAsync(sends);
-                    AddMessage("向转盘发送 " + sends);
+                    //string sends = "SNOK";
+                    //await udp1.SendAsync(sends);
+                    //AddMessage("向转盘发送 " + sends);
                     try
                     {
                         //SN1:G5Y9301RDD0K9037V-GF,P;SN2:G5Y9301RDCNK9037A-GF,P
